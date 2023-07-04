@@ -101,5 +101,22 @@ namespace Movies.EF.Repositories
 			_context.Update(entity);
 			return entity;
 		}
+
+		public List<S> GetAllByExpressionWithInclude<S>(Func<T, S> selector, Func<S, bool> expression, string[] includes)
+		{
+			IQueryable<T> query = _context.Set<T>();
+
+            foreach (var include in includes)
+            {
+				query = query.Include(include);
+            }
+
+			var selectedDto = query.Select(selector);
+
+
+			return selectedDto.Where(expression).ToList();
+
+
+        }
 	}
 }

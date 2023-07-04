@@ -15,6 +15,8 @@ namespace Movies.Core.Interfaces
 
 		public S? GetByExpressionWithInclude<S>(Func<T, S> selector, Func<S, bool> expression, string[] includes);
 
+		public List<S> GetAllByExpressionWithInclude<S>(Func<T, S> selector, Func<S, bool> expression, string[] includes);
+
 		Task<T?> GetByExpressionAsync(Expression<Func<T , bool>> expression);
 
 		Task<int?> AddAsync(T entity);

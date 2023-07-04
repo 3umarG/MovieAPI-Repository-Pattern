@@ -39,9 +39,9 @@ namespace MoviesApi.Controllers
 		}
 
 		[HttpGet("{id:int}")]
-		public  IActionResult GetMovieByIdAsync(int id)
+		public IActionResult GetMovieByIdAsync(int id)
 		{
-			var movie =  _unitOfWork.Movies.GetByExpressionWithInclude<MovieResponseDto>(
+			var movie = _unitOfWork.Movies.GetByExpressionWithInclude<MovieResponseDto>(
 					M => new MovieResponseDto
 					{
 						ID = M.ID,
@@ -56,8 +56,8 @@ namespace MoviesApi.Controllers
 						Year = M.Year
 					},
 					M => M.ID == id,
-					new string[] {"Genre"}
-					
+					new string[] { "Genre" }
+
 				);
 			//var movieDto = new MovieResponseDto();
 			if (movie is null)
@@ -98,8 +98,22 @@ namespace MoviesApi.Controllers
 				{ StatusCode = (int)HttpStatusCode.NotFound };
 			}
 
-			var movies = await _unitOfWork.Movies.GetMoviesByGenreIdAsync(id);
-			return SuccessObjectResult<List<Movie>>(movies, (int)HttpStatusCode.OK);
+			var movies = _unitOfWork.Movies.GetAllByExpressionWithInclude<MovieResponseDto>(
+			M => new MovieResponseDto {
+				ID = M.ID,
+				Genre = new GenreResponseDto
+				{
+					Id = M.Genre.ID,
+					Name = M.Genre.Name
+				},
+				Rate = M.Rate,
+				StoryLine = M.StoryLine,
+				Title = M.Title,
+				Year = M.Year
+			},
+			M => M.Genre.Id == id,
+			new string[] { "Genre" });
+			return SuccessObjectResult<List<MovieResponseDto>>(movies, (int)HttpStatusCode.OK);
 		}
 
 		[HttpPost]
