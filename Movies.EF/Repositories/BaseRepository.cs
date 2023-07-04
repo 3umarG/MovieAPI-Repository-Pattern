@@ -55,6 +55,19 @@ namespace Movies.EF.Repositories
 			return  _context.Set<T>().Select(selector).ToList();
 		}
 
+		public List<S> GetAllAsync<S>(Func<T, S> selector , string[] includes)
+		{
+			IQueryable<T> query = _context.Set<T>();
+
+            foreach (var icnlude in includes)
+            {
+				query = query.Include(icnlude);
+            }
+
+			var result = query.Select(selector).ToList();
+			return result;
+        }
+
 		public async Task<T?> GetByExpressionAsync(Expression<Func<T, bool>> expression)
 		{
 			return await _context.Set<T>().FirstOrDefaultAsync(expression);
