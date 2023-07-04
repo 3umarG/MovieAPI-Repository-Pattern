@@ -1,13 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.IdentityModel.Tokens;
-using MoviesApi.DTOs;
-using MoviesApi.Models;
-using MoviesApi.Models.Errors;
-using System.Net;
-using System.Security.Claims;
-using System.Threading.Tasks;
+﻿using Movies.Core.Interfaces;
 
 namespace MoviesApi.Controllers
 {
@@ -15,11 +6,11 @@ namespace MoviesApi.Controllers
 	[ApiController]
 	public class GenresController : ControllerBase
 	{
-		private readonly ApplicationDbContext _context;
+		private readonly IUnitOfWork _unitOfWork;
 
-		public GenresController(ApplicationDbContext context)
+		public GenresController(IUnitOfWork unitOfWork)
 		{
-			_context = context;
+			_unitOfWork = unitOfWork;
 		}
 
 		[HttpGet]
@@ -31,7 +22,7 @@ namespace MoviesApi.Controllers
 				{
 					Message = "Get All Genres Successfully .",
 					StatusCode = 200,
-					Data = await _context.Genres.ToListAsync()
+					Data = await _unitOfWork.Genres.GetAllAsync()
 				});
 			}
 			catch
@@ -56,8 +47,9 @@ namespace MoviesApi.Controllers
 			else
 			{
 				var g = new Genre { Name = genre.Name };
-				await _context.AddAsync(g);
-				_context.SaveChanges();
+				//await _context.AddAsync(g);
+				await _unitOfWork.Genres.AddAsync(g);
+				_unitOfWork.Complete();
 
 				// Only one message
 				//return Content(HttpStatusCode.Created.ToString(), "Created Genre Succfully");
@@ -78,18 +70,19 @@ namespace MoviesApi.Controllers
 			if (dto.Name.IsNullOrEmpty())
 			{
 				return new BadRequestObjectResult(new CustomResponse<object>()
-				{ 
+				{
 					Status = false,
 					StatusCode = 400,
-					Message = "You should provide Genre name for update" 
+					Message = "You should provide Genre name for update"
 				});
 			}
 
-			var genre = await _context.Genres.FirstOrDefaultAsync(g => g.ID == id);
+			//var genre = await _context.Genres.FirstOrDefaultAsync(g => g.ID == id);
+			var genre = await _unitOfWork.Genres.GetByExpressionAsync(G => G.ID == (byte)id);
 			if (genre is null)
 			{
 				return new NotFoundObjectResult(new CustomResponse<object>()
-				{ 
+				{
 					Status = false,
 					StatusCode = 404,
 					Message = $"There is no Genre with ID : {id}"
@@ -97,7 +90,7 @@ namespace MoviesApi.Controllers
 			}
 
 			genre.Name = dto.Name;
-			_context.SaveChanges();
+			_unitOfWork.Complete();
 
 
 			return new OkObjectResult(new CustomResponse<Genre>()
@@ -112,19 +105,20 @@ namespace MoviesApi.Controllers
 		[HttpDelete("{id}")]
 		public async Task<IActionResult> DeleteAsync(int id)
 		{
-			var genre = await _context.Genres.FirstOrDefaultAsync(g => g.ID == id);
+			//var genre = await _context.Genres.FirstOrDefaultAsync(g => g.ID == id);
+			var genre = await _unitOfWork.Genres.GetByExpressionAsync(G => G.ID == (byte)id);
 			if (genre is null)
 			{
 				return NotFound(new CustomResponse<object>()
-				{ 
+				{
 					Status = false,
 					Message = $"Cannot Find Genre with id : {id}",
 					StatusCode = 404
 				});
 			}
 
-			_context.Remove(genre);
-			_context.SaveChanges();
+			_unitOfWork.Genres.Delete(genre);
+			_unitOfWork.Complete();
 
 			//return NoContent();
 			return new OkObjectResult(

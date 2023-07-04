@@ -86,3 +86,8 @@ D:\CS_projects\WebApi\FirstWebApi\obj\Debug\net6.0\MoviesApi.pdb
 D:\CS_projects\WebApi\FirstWebApi\obj\Debug\net6.0\MoviesApi.genruntimeconfig.cache
 D:\CS_projects\WebApi\FirstWebApi\obj\Debug\net6.0\ref\MoviesApi.dll
 D:\CS_projects\WebApi\FirstWebApi\bin\Debug\net6.0\Newtonsoft.Json.dll
+D:\CS_projects\WebApi\FirstWebApi\bin\Debug\net6.0\MathNet.Numerics.dll
+D:\CS_projects\WebApi\FirstWebApi\bin\Debug\net6.0\Movies.Core.dll
+D:\CS_projects\WebApi\FirstWebApi\bin\Debug\net6.0\Movies.EF.dll
+D:\CS_projects\WebApi\FirstWebApi\bin\Debug\net6.0\Movies.Core.pdb
+D:\CS_projects\WebApi\FirstWebApi\bin\Debug\net6.0\Movies.EF.pdb
