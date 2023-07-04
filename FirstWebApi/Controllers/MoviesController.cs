@@ -1,62 +1,64 @@
 ﻿
 
+using Movies.Core.DTOs;
+using Movies.Core.Interfaces;
+
 namespace MoviesApi.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
 	public class MoviesController : ControllerBase
 	{
-		private readonly ApplicationDbContext _context;
 		private readonly string[] _allowedImageExtensions = { ".jpg", ".png" };
 		private readonly long _maxPosterLengthInByte = 1048576;
 
-		public MoviesController(ApplicationDbContext context)
+
+		private readonly IUnitOfWork _unitOfWork;
+		public MoviesController(IUnitOfWork unitOfWork)
 		{
-			_context = context;
+			_unitOfWork = unitOfWork;
 		}
 
 
 		[HttpGet]
-		public async Task<IActionResult> GetAllAsync()
+		public IActionResult GetAll()
 		{
-			var movies = await _context
-				.Movies
-				.Include(M => M.Genre)
-				.AsNoTracking()
-				.Select(M => new MovieResponseDto()
-				{
-					ID = M.ID,
-					Title = M.Title,
-					Genre = new GenreResponseDto()
+			var movies = _unitOfWork.Movies.GetAllAsync<MovieResponseDto>(
+					M => new MovieResponseDto()
 					{
-						Id = M.Genre.ID,
-						Name = M.Genre.Name
-					}
-				})
-				.ToListAsync();
+						ID = M.ID,
+						Rate = M.Rate,
+						Title = M.Title,
+						Year = M.Year,
+						Genre = new GenreResponseDto { Id = M.Genre.ID, Name = M.Genre.Name },
+						StoryLine = M.StoryLine
+					},
+					new string[] { "Genre" }
+				);
 			return SuccessObjectResult<List<MovieResponseDto>>(movies, (int)HttpStatusCode.OK);
 		}
 
 		[HttpGet("{id:int}")]
-		public async Task<IActionResult> GetMovieByIdAsync(int id)
+		public IActionResult GetMovieByIdAsync(int id)
 		{
-			var movie = await _context
-				.Movies
-				.Include(M => M.Genre)
-				.Select(M => new MovieResponseDto()
-				{
-					ID = M.ID,
-					Title = M.Title,
-					Genre = new GenreResponseDto()
+			var movie = _unitOfWork.Movies.GetByExpressionWithInclude<MovieResponseDto>(
+					M => new MovieResponseDto
 					{
-						Id = M.Genre.ID,
-						Name = M.Genre.Name
+						ID = M.ID,
+						Genre = new GenreResponseDto
+						{
+							Id = M.Genre.ID,
+							Name = M.Genre.Name
+						},
+						Rate = M.Rate,
+						StoryLine = M.StoryLine,
+						Title = M.Title,
+						Year = M.Year
 					},
-					StoryLine = M.StoryLine,
-					Rate = M.Rate,
-					Year = M.Year
-				})
-				.FirstOrDefaultAsync(M => M.ID == id);
+					M => M.ID == id,
+					new string[] { "Genre" }
+
+				);
 			//var movieDto = new MovieResponseDto();
 			if (movie is null)
 			{
@@ -80,7 +82,8 @@ namespace MoviesApi.Controllers
 		[HttpGet("GetMoviesByGenreId")]
 		public async Task<IActionResult> GetMoviesByGenreId(byte id)
 		{
-			var isValidGenre = await _context.Genres.AnyAsync(G => G.ID == id);
+			//var isValidGenre = await _context.Genres.AnyAsync(G => G.ID == id);
+			var isValidGenre = await _unitOfWork.Genres.AnyAsync(G => G.ID == id);
 			if (!isValidGenre)
 			{
 				return new NotFoundObjectResult(
@@ -95,23 +98,22 @@ namespace MoviesApi.Controllers
 				{ StatusCode = (int)HttpStatusCode.NotFound };
 			}
 
-			var movies = await _context
-				.Movies
-				.Where(M => M.GenreID == id)
-				.Select(M => new MovieResponseDto()
+			var movies = _unitOfWork.Movies.GetAllByExpressionWithInclude<MovieResponseDto>(
+			M => new MovieResponseDto
+			{
+				ID = M.ID,
+				Genre = new GenreResponseDto
 				{
-					Genre = new GenreResponseDto
-					{
-						Id = M.Genre.ID,
-						Name = M.Genre.Name
-					},
-					ID = M.ID,
-					Rate = M.Rate,
-					Title = M.Title,
-					StoryLine = M.StoryLine,
-					Year = M.Year
-				})
-				.ToListAsync();
+					Id = M.Genre.ID,
+					Name = M.Genre.Name
+				},
+				Rate = M.Rate,
+				StoryLine = M.StoryLine,
+				Title = M.Title,
+				Year = M.Year
+			},
+			M => M.Genre.Id == id,
+			new string[] { "Genre" });
 			return SuccessObjectResult<List<MovieResponseDto>>(movies, (int)HttpStatusCode.OK);
 		}
 
@@ -137,8 +139,8 @@ namespace MoviesApi.Controllers
 				Title = dto.Title,
 				Year = dto.Year!.Value,
 			};
-			_context.Add(movie);
-			await _context.SaveChangesAsync();
+			await _unitOfWork.Movies.AddAsync(movie);
+			_unitOfWork.Complete();
 
 			return SuccessObjectResult<Movie>(movie, (int)HttpStatusCode.Created);
 		}
@@ -147,7 +149,11 @@ namespace MoviesApi.Controllers
 		[HttpPut("{id}")]
 		public async Task<IActionResult> Update(int id, [FromForm] MovieRequestDto dto)
 		{
-			var movie = await _context.Movies.Include(M => M.Genre).FirstOrDefaultAsync(M => M.ID == id);
+			//var movie = await _context.Movies.Include(M => M.Genre).FirstOrDefaultAsync(M => M.ID == id);
+			var movie = _unitOfWork.Movies.GetByExpressionWithInclude(
+					M => M.ID == id,
+					new string[] { "Genre" }
+				);
 			if (movie is null)
 			{
 				return HandleBadRequestError(new List<string> { $"There is no Movie with ID : {id}" });
@@ -174,7 +180,7 @@ namespace MoviesApi.Controllers
 			movie.Rate = dto.Rate!.Value;
 			movie.Title = dto.Title!;
 
-			_context.SaveChanges();
+			_unitOfWork.Movies.Update(movie);
 
 			return SuccessObjectResult(new MovieResponseDto()
 			{
@@ -194,9 +200,12 @@ namespace MoviesApi.Controllers
 
 
 		[HttpDelete("{id}")]
-		public async Task<IActionResult> Delete(int id)
+		public IActionResult Delete(int id)
 		{
-			var movie = await _context.Movies.FindAsync(id);
+			var movie = _unitOfWork.Movies.GetByExpressionWithInclude(
+					M => M.ID == id,
+					new string[] { "Genre" }
+			);
 			if (movie is null)
 				return new NotFoundObjectResult(new CustomResponse<object>()
 				{
@@ -208,9 +217,22 @@ namespace MoviesApi.Controllers
 
 
 
-			_context.Movies.Remove(movie);
-			await _context.SaveChangesAsync();
-			return SuccessObjectResult<Movie>(movie, 200);
+			//_context.Movies.Remove(movie);
+			_unitOfWork.Movies.Delete(movie);
+			_unitOfWork.Complete();
+			return SuccessObjectResult<MovieResponseDto>(new MovieResponseDto
+			{
+				ID = movie.ID,
+				Title = movie.Title,
+				Genre = new GenreResponseDto
+				{
+					Id = movie.Genre.ID,
+					Name = movie.Genre.Name,
+				},
+				Rate = movie.Rate,
+				StoryLine = movie.StoryLine,
+				Year = movie.Year
+			} ,200);
 		}
 
 
@@ -240,7 +262,8 @@ namespace MoviesApi.Controllers
 				errors.Add("Please Provide you Movie info");
 				return;
 			}
-			var isValidGenre = await _context.Genres.AnyAsync(G => G.ID == dto.GenreID);
+			//var isValidGenre = await _context.Genres.AnyAsync(G => G.ID == dto.GenreID);
+			var isValidGenre = await _unitOfWork.Genres.AnyAsync(G => G.ID == dto.GenreID);
 			if (dto.Poster != null)
 			{
 				if (dto.Poster.Length > _maxPosterLengthInByte)
