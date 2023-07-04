@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,6 +12,7 @@ namespace Movies.Core.Interfaces
 		Task<List<T>> GetAllAsync();
 
 		Task<T?> GetByIdAsync(int id);
+		Task<T?> GetByExpressionAsync(Expression<Func<T , bool>> expression);
 
 		Task<int?> AddAsync(T entity);
 

@@ -4,6 +4,7 @@ using Movies.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -44,11 +45,18 @@ namespace Movies.EF.Repositories
 			return await _context.Set<T>().ToListAsync();
 		}
 
+		public async Task<T?> GetByExpressionAsync(Expression<Func<T, bool>> expression)
+		{
+			return await _context.Set<T>().FirstOrDefaultAsync(expression);
+		}
+
 		public async Task<T?> GetByIdAsync(int id)
 		{
 			var entity = await _context.Set<T>().FindAsync(id);
 			return entity;
 		}
+
+		
 
 		public T UpdateAsync(T entity)
 		{
