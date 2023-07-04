@@ -50,6 +50,11 @@ namespace Movies.EF.Repositories
 			return await _context.Set<T>().ToListAsync();
 		}
 
+		public  List<S> GetAllAsync<S>(Func<T , S> selector)
+		{
+			return  _context.Set<T>().Select(selector).ToList();
+		}
+
 		public async Task<T?> GetByExpressionAsync(Expression<Func<T, bool>> expression)
 		{
 			return await _context.Set<T>().FirstOrDefaultAsync(expression);

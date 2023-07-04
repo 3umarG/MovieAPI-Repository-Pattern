@@ -24,7 +24,7 @@ namespace Movies.Core.Interfaces
 
 		Task<bool> AnyAsync(Expression<Func<T , bool>> expression);
 
-
+		List<S> GetAllAsync<S>(Func<T, S> selector);
 
 	}
 }
