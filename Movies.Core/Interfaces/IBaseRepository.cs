@@ -20,8 +20,9 @@ namespace Movies.Core.Interfaces
 
 		void Delete(T entity);
 
-		T UpdateAsync(T entity);
+		T Update(T entity);
 
+		Task<bool> AnyAsync(Expression<Func<T , bool>> expression);
 
 
 

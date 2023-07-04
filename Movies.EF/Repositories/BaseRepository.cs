@@ -25,6 +25,11 @@ namespace Movies.EF.Repositories
 			return await _context.SaveChangesAsync();
 		}
 
+		public async Task<bool> AnyAsync(Expression<Func<T, bool>> expression)
+		{
+			return await _context.Set<T>().AnyAsync(expression);
+		}
+
 		public void Delete(T entity)
 		{
 			_context.Set<T>().Remove(entity);
@@ -58,7 +63,7 @@ namespace Movies.EF.Repositories
 
 		
 
-		public T UpdateAsync(T entity)
+		public T Update(T entity)
 		{
 			_context.Update(entity);
 			return entity;
