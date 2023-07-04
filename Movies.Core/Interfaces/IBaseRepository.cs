@@ -12,6 +12,9 @@ namespace Movies.Core.Interfaces
 		Task<List<T>> GetAllAsync();
 
 		Task<T?> GetByIdAsync(int id);
+
+		public S? GetByExpressionWithInclude<S>(Func<T, S> selector, Func<S, bool> expression, string[] includes);
+
 		Task<T?> GetByExpressionAsync(Expression<Func<T , bool>> expression);
 
 		Task<int?> AddAsync(T entity);

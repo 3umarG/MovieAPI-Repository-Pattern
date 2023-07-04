@@ -1,5 +1,6 @@
 ﻿
 
+using Movies.Core.DTOs;
 using Movies.Core.Interfaces;
 
 namespace MoviesApi.Controllers
@@ -38,9 +39,26 @@ namespace MoviesApi.Controllers
 		}
 
 		[HttpGet("{id:int}")]
-		public async Task<IActionResult> GetMovieByIdAsync(int id)
+		public  IActionResult GetMovieByIdAsync(int id)
 		{
-			var movie = await _unitOfWork.Movies.GetByIdAsync(id);
+			var movie =  _unitOfWork.Movies.GetByExpressionWithInclude<MovieResponseDto>(
+					M => new MovieResponseDto
+					{
+						ID = M.ID,
+						Genre = new GenreResponseDto
+						{
+							Id = M.Genre.ID,
+							Name = M.Genre.Name
+						},
+						Rate = M.Rate,
+						StoryLine = M.StoryLine,
+						Title = M.Title,
+						Year = M.Year
+					},
+					M => M.ID == id,
+					new string[] {"Genre"}
+					
+				);
 			//var movieDto = new MovieResponseDto();
 			if (movie is null)
 			{
@@ -57,7 +75,7 @@ namespace MoviesApi.Controllers
 				);
 			}
 
-			return SuccessObjectResult<Movie>(movie, (int)HttpStatusCode.OK);
+			return SuccessObjectResult<MovieResponseDto>(movie, (int)HttpStatusCode.OK);
 		}
 
 

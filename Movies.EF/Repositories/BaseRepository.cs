@@ -50,23 +50,23 @@ namespace Movies.EF.Repositories
 			return await _context.Set<T>().ToListAsync();
 		}
 
-		public  List<S> GetAllAsync<S>(Func<T , S> selector)
+		public List<S> GetAllAsync<S>(Func<T, S> selector)
 		{
-			return  _context.Set<T>().Select(selector).ToList();
+			return _context.Set<T>().Select(selector).ToList();
 		}
 
-		public List<S> GetAllAsync<S>(Func<T, S> selector , string[] includes)
+		public List<S> GetAllAsync<S>(Func<T, S> selector, string[] includes)
 		{
 			IQueryable<T> query = _context.Set<T>();
 
-            foreach (var icnlude in includes)
-            {
+			foreach (var icnlude in includes)
+			{
 				query = query.Include(icnlude);
-            }
+			}
 
 			var result = query.Select(selector).ToList();
 			return result;
-        }
+		}
 
 		public async Task<T?> GetByExpressionAsync(Expression<Func<T, bool>> expression)
 		{
@@ -79,7 +79,22 @@ namespace Movies.EF.Repositories
 			return entity;
 		}
 
-		
+		public S? GetByExpressionWithInclude<S>(Func<T, S> selector, Func<S, bool> expression,  string[] includes)
+		{
+			IQueryable<T> query = _context.Set<T>();
+
+			foreach (var include in includes)
+			{
+				query = query.Include(include);
+			}
+
+			var matched = query.Select(selector); // All Dtos , but without any matching with id
+
+			return  matched.FirstOrDefault(expression);
+			
+		}
+
+
 
 		public T Update(T entity)
 		{
