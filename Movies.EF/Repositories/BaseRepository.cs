@@ -24,6 +24,11 @@ namespace Movies.EF.Repositories
 			return await _context.SaveChangesAsync();
 		}
 
+		public void DeleteAsync(T entity)
+		{
+			_context.Set<T>().Remove(entity);
+		}
+
 		public async Task<int?> DeleteByIdAsync(int id)
 		{
 			var entity = await _context.Set<T>().FindAsync(id);
