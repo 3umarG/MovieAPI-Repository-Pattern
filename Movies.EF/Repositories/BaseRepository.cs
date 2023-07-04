@@ -98,7 +98,8 @@ namespace Movies.EF.Repositories
 
 		public T Update(T entity)
 		{
-			_context.Update(entity);
+			_context.Set<T>().Update(entity);
+			_context.SaveChanges();
 			return entity;
 		}
 
@@ -117,6 +118,18 @@ namespace Movies.EF.Repositories
 			return selectedDto.Where(expression).ToList();
 
 
+        }
+
+		public T? GetByExpressionWithInclude(Func<T, bool> expression, string[] includes)
+		{
+			IQueryable<T> query = _context.Set<T>();
+
+            foreach (var include in includes)
+            {
+				query = query.Include(include);
+            }
+
+			return query.FirstOrDefault(expression);
         }
 	}
 }

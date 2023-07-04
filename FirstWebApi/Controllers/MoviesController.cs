@@ -99,7 +99,8 @@ namespace MoviesApi.Controllers
 			}
 
 			var movies = _unitOfWork.Movies.GetAllByExpressionWithInclude<MovieResponseDto>(
-			M => new MovieResponseDto {
+			M => new MovieResponseDto
+			{
 				ID = M.ID,
 				Genre = new GenreResponseDto
 				{
@@ -149,7 +150,10 @@ namespace MoviesApi.Controllers
 		public async Task<IActionResult> Update(int id, [FromForm] MovieRequestDto dto)
 		{
 			//var movie = await _context.Movies.Include(M => M.Genre).FirstOrDefaultAsync(M => M.ID == id);
-			var movie = await _unitOfWork.Movies.GetByIdAsync(id);
+			var movie =  _unitOfWork.Movies.GetByExpressionWithInclude(
+					M => M.ID == id,
+					new string[] { "Genre" }
+				);
 			if (movie is null)
 			{
 				return HandleBadRequestError(new List<string> { $"There is no Movie with ID : {id}" });
