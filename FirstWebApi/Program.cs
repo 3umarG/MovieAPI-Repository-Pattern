@@ -1,4 +1,7 @@
 
+using Movies.Core.Interfaces;
+using Movies.EF;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -14,6 +17,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(
 	options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
 	b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)
 	));
+
+builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 
 var app = builder.Build();
 
