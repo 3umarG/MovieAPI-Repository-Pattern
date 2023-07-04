@@ -1,15 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.IdentityModel.Tokens;
-using MoviesApi.DTOs;
-using MoviesApi.Models;
-using MoviesApi.Models.Errors;
-using System.Net;
-using System.Security.Claims;
-using System.Threading.Tasks;
-
-namespace MoviesApi.Controllers
+﻿namespace MoviesApi.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
