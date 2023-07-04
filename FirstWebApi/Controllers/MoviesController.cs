@@ -150,7 +150,7 @@ namespace MoviesApi.Controllers
 		public async Task<IActionResult> Update(int id, [FromForm] MovieRequestDto dto)
 		{
 			//var movie = await _context.Movies.Include(M => M.Genre).FirstOrDefaultAsync(M => M.ID == id);
-			var movie =  _unitOfWork.Movies.GetByExpressionWithInclude(
+			var movie = _unitOfWork.Movies.GetByExpressionWithInclude(
 					M => M.ID == id,
 					new string[] { "Genre" }
 				);
@@ -200,9 +200,12 @@ namespace MoviesApi.Controllers
 
 
 		[HttpDelete("{id}")]
-		public async Task<IActionResult> Delete(int id)
+		public IActionResult Delete(int id)
 		{
-			var movie = await _unitOfWork.Movies.GetByIdAsync(id);
+			var movie = _unitOfWork.Movies.GetByExpressionWithInclude(
+					M => M.ID == id,
+					new string[] { "Genre" }
+			);
 			if (movie is null)
 				return new NotFoundObjectResult(new CustomResponse<object>()
 				{
@@ -217,7 +220,19 @@ namespace MoviesApi.Controllers
 			//_context.Movies.Remove(movie);
 			_unitOfWork.Movies.Delete(movie);
 			_unitOfWork.Complete();
-			return SuccessObjectResult<Movie>(movie, 200);
+			return SuccessObjectResult<MovieResponseDto>(new MovieResponseDto
+			{
+				ID = movie.ID,
+				Title = movie.Title,
+				Genre = new GenreResponseDto
+				{
+					Id = movie.Genre.ID,
+					Name = movie.Genre.Name,
+				},
+				Rate = movie.Rate,
+				StoryLine = movie.StoryLine,
+				Year = movie.Year
+			} ,200);
 		}
 
 
