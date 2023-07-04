@@ -16,7 +16,7 @@ namespace Movies.Core.Interfaces
 
 		Task<int?> DeleteByIdAsync(int id);
 
-		Task<int?> UpdateAsync(T entity);
+		T UpdateAsync(T entity);
 
 
 
