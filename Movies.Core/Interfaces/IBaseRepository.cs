@@ -10,13 +10,13 @@ namespace Movies.Core.Interfaces
 	{
 		Task<List<T>> GetAllAsync();
 
-		Task<T> GetByIdAsync(int id);
+		Task<T?> GetByIdAsync(int id);
 
-		Task AddAsync(T entity);
+		Task<int?> AddAsync(T entity);
 
-		Task DeleteByIdAsync(int id);
+		Task<int?> DeleteByIdAsync(int id);
 
-		Task UpdateAsync(T entity);
+		Task<int?> UpdateAsync(T entity);
 
 
 
