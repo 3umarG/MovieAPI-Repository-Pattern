@@ -254,5 +254,60 @@ namespace MoviesApi.Tests.Controllers
 			objectResult.StatusCode.Should().Be(200);
 			contentObjectResult.Should().BeEquivalentTo(actualContent);
 		}
+
+		[Fact]
+		public async Task DeleteGenreAsync_AcceptNotFoundGenreId_ReturnNotFoundObjectResultResponse()
+		{
+			// Arrange
+			Genre? genre = null;
+			A.CallTo(() => _unitOfWork
+									.Genres
+									.GetByExpressionAsync(A<Expression<Func<Genre, bool>>>.Ignored))
+									.Returns(genre);
+
+			// Act
+			var actionResult = await _controller.DeleteAsync(1);
+			var objectResult = actionResult as NotFoundObjectResult;
+			var contentResult = objectResult!.Value as CustomResponse<object>;
+			var expectedContentResult = CustomResponse<object>.CreateFailureCustomResponse(404, new List<string> { "There is No Genre with the provided Id" });
+			var expectedStatusCode = (int)HttpStatusCode.NotFound;
+
+
+			// Assert
+			actionResult.Should().NotBeNull();
+			objectResult.Should().NotBeNull();
+			contentResult.Should().NotBeNull();
+			contentResult.Should().BeEquivalentTo(expectedContentResult);
+			objectResult.StatusCode.Should().Be(expectedStatusCode);
+		}
+
+
+		[Fact]
+		public async Task DeleteGenreAsync_DeleteExistGenre_ReturnOkObjectResultResponse()
+		{
+			// Arrange
+			var genre = A.Fake<Genre>();
+			genre.Name = "Foo";
+			A.CallTo(() => _unitOfWork
+									.Genres
+									.GetByExpressionAsync(A<Expression<Func<Genre, bool>>>.Ignored))
+									.Returns(genre);
+
+			// Act
+			var actionResult = await _controller.DeleteAsync(1);
+			var objectResult = actionResult as OkObjectResult;
+			var contentResult = objectResult!.Value as CustomResponse<Genre>;
+			var expectedContentResult = CustomResponse<Genre>.CreateSuccessCustomResponse(200, genre);
+			var expectedStatusCode = (int)HttpStatusCode.OK;
+
+
+			// Assert
+			actionResult.Should().NotBeNull();
+			objectResult.Should().NotBeNull();
+			contentResult.Should().NotBeNull();
+			contentResult.Should().BeEquivalentTo(expectedContentResult);
+			objectResult.StatusCode.Should().Be(expectedStatusCode);
+
+		}
 	}
 }

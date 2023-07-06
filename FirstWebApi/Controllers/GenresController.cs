@@ -109,25 +109,15 @@ namespace MoviesApi.Controllers
 			var genre = await _unitOfWork.Genres.GetByExpressionAsync(G => G.ID == (byte)id);
 			if (genre is null)
 			{
-				return NotFound(new CustomResponse<object>()
-				{
-					Status = false,
-					Message = $"Cannot Find Genre with id : {id}",
-					StatusCode = 404
-				});
+				return new NotFoundObjectResult(
+					CustomResponse<object>.CreateFailureCustomResponse(404, new List<string> { "There is No Genre with the provided Id"}));
 			}
 
 			_unitOfWork.Genres.Delete(genre);
 			_unitOfWork.Complete();
 
-			//return NoContent();
 			return new OkObjectResult(
-				new CustomResponse<Genre>()
-				{
-					StatusCode = (int)HttpStatusCode.OK,
-					Message = "Deleted Genre Successfuly",
-					Data = genre,
-				});
+				CustomResponse<Genre>.CreateSuccessCustomResponse(200, genre));
 		}
 	}
 }
