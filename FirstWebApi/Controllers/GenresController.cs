@@ -40,16 +40,20 @@ namespace MoviesApi.Controllers
 			if (genre.Name.IsNullOrEmpty())
 			{
 
-				return new NotFoundObjectResult(new CustomResponse<object>()
-				{
-					Status = false,
-					StatusCode = 404,
-					Message = "Genre Name Should be specified !!",
-				});
+				//return new BadRequestObjectResult(new CustomResponse<object>()
+				//{
+				//	Status = false,
+				//	StatusCode = 404,
+				//	Message = "Genre Name Should be specified !!",
+				//});
+
+				return new BadRequestObjectResult(
+						CustomResponse<object>.CreateFailureCustomResponse((int)HttpStatusCode.BadRequest ,new List<string> { "You should provide Name for Genre " })
+					) ;
 			}
 			else
 			{
-				var g = new Genre { Name = genre.Name };
+				var g = new Genre { Name = genre.Name! };
 				//await _context.AddAsync(g);
 				await _unitOfWork.Genres.AddAsync(g);
 				_unitOfWork.Complete();
@@ -58,8 +62,10 @@ namespace MoviesApi.Controllers
 				//return Content(HttpStatusCode.Created.ToString(), "Created Genre Succfully");
 
 				return new ObjectResult(
-					new CustomResponse<Genre>()
-					{ StatusCode = 201, Data = g, Message = "Created Genre Succefully !!" })
+					CustomResponse<Genre>.CreateSuccessCustomResponse(
+						(int)HttpStatusCode.Created,
+						g
+					))
 				{ StatusCode = StatusCodes.Status201Created };
 
 

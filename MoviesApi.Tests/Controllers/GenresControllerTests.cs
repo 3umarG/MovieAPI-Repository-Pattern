@@ -1,6 +1,8 @@
-﻿using FakeItEasy;
+﻿using Castle.Core.Internal;
+using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
+using Movies.Core.DTOs;
 using Movies.Core.Interfaces;
 using Movies.Core.Models;
 using MoviesApi.Controllers;
@@ -74,7 +76,7 @@ namespace MoviesApi.Tests.Controllers
 			OkObjectResult? okObjectResult = actionResult as OkObjectResult;
 			CustomResponse<List<Genre>>? okObjectResultValue = okObjectResult!.Value as CustomResponse<List<Genre>>;
 
-			CustomResponse<List<Genre>> expectedResult = 
+			CustomResponse<List<Genre>> expectedResult =
 				CustomResponse<List<Genre>>.CreateSuccessCustomResponse(200, new List<Genre> { });
 
 
@@ -100,6 +102,70 @@ namespace MoviesApi.Tests.Controllers
 			// Assert
 			Assert.NotNull(actionResult);
 			Assert.NotNull(badRequestObjectResult);
+		}
+
+
+		[Fact]
+		public async Task CreateGenreAsync_AcceptNullNameForGenre_ReturnBadRequest()
+		{
+			// Arrange
+			var genreDto = new GenreRequestDto
+			{
+				Name = string.Empty
+			};
+
+
+
+			// Act
+			var actionResult = await _controller.CreateGenreAsync(genreDto);
+			var badRequestObjectResult = actionResult as BadRequestObjectResult;
+			var badRequestValue = badRequestObjectResult!.Value as CustomResponse<object>;
+
+			var actualBadRequestResult =
+				CustomResponse<object>.CreateFailureCustomResponse(
+						(int)HttpStatusCode.BadRequest,
+						new List<string> { "You should provide Name for Genre " }
+					);
+
+
+			// Assert
+			actionResult.Should().NotBeNull();
+			badRequestObjectResult.Should().NotBeNull();
+			badRequestValue.Should().NotBeNull();
+			badRequestValue.Should().BeEquivalentTo(actualBadRequestResult);
+		}
+
+		[Fact]
+		public async Task CreatGenreAsync_AddVlidGenre_ReturnCreatedObjectResult()
+		{
+			// Arrange
+			var genreDto = new GenreRequestDto
+			{
+				Name = "Foo"
+			};
+
+			// Act
+			var actionResult = await _controller.CreateGenreAsync(genreDto);
+			var createObjectResult = actionResult as ObjectResult;
+			var objectResultContent = createObjectResult!.Value as CustomResponse<Genre>;
+
+			var expectedObjectResultContent = CustomResponse<Genre>.CreateSuccessCustomResponse(
+
+				(int)HttpStatusCode.Created,
+				new Genre
+				{
+					Name = genreDto.Name!
+				}
+			);
+
+
+			// Assert
+			actionResult.Should().NotBeNull();
+			createObjectResult.Should().NotBeNull();
+			createObjectResult.GetType()!.GetProperty("StatusCode")!.GetValue(actionResult).Should().Be((int)HttpStatusCode.Created);
+
+			objectResultContent.Should().NotBeNull();
+			objectResultContent.Should().BeEquivalentTo(expectedObjectResultContent);
 		}
 	}
 }
