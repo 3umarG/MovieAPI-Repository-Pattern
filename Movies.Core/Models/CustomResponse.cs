@@ -11,7 +11,7 @@
 
 		public List<string>? Errors { get; set; }
 
-		static CustomResponse<object> CreateFailureCustomResponse(int statusCode, List<string> errors)
+		public static CustomResponse<object> CreateFailureCustomResponse(int statusCode, List<string> errors)
 			=> new()
 			{
 				Status = false,
@@ -21,7 +21,7 @@
 			};
 
 
-		static CustomResponse<T> CreateSuccessCustomResponse(int statusCode, T data)
+		public static CustomResponse<T> CreateSuccessCustomResponse(int statusCode, T data)
 			=> new()
 			{
 				Data = data,

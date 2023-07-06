@@ -18,12 +18,15 @@ namespace MoviesApi.Controllers
 		{
 			try
 			{
-				return new OkObjectResult(new CustomResponse<List<Genre>>()
-				{
-					Message = "Get All Genres Successfully .",
-					StatusCode = 200,
-					Data = await _unitOfWork.Genres.GetAllAsync()
-				});
+				//return new OkObjectResult(new CustomResponse<List<Genre>>()
+				//{
+				//	Message = "Get All Genres Successfully .",
+				//	StatusCode = 200,
+				//	Data = await _unitOfWork.Genres.GetAllAsync()
+				//});
+
+				var data = await _unitOfWork.Genres.GetAllAsync();
+				return new OkObjectResult(CustomResponse<List<Genre>>.CreateSuccessCustomResponse(200, data));
 			}
 			catch
 			{
