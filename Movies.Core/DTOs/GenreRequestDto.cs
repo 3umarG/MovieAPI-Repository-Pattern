@@ -6,6 +6,6 @@ namespace Movies.Core.DTOs
 	public class GenreRequestDto
 	{
 		[MaxLength(100)]
-        public string? Name { get; set; }
+        public virtual string? Name { get; set; }
     }
 }

@@ -2,6 +2,7 @@
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
+using Moq;
 using Movies.Core.DTOs;
 using Movies.Core.Interfaces;
 using Movies.Core.Models;
@@ -9,6 +10,7 @@ using MoviesApi.Controllers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
@@ -166,6 +168,91 @@ namespace MoviesApi.Tests.Controllers
 
 			objectResultContent.Should().NotBeNull();
 			objectResultContent.Should().BeEquivalentTo(expectedObjectResultContent);
+		}
+
+		[Fact]
+		public async Task UpdateGenreAsync_ProvideGenreNameEmptyOrNull_ReturnBadResponse()
+		{
+			// Arrange
+			var genreDto = new GenreRequestDto
+			{
+				Name = string.Empty
+			};
+
+
+			// Act
+			var actionResult = await _controller.UpdateAsync(1, genreDto);
+			var badRequestObjectResult = actionResult as BadRequestObjectResult;
+			var badRequestValue = badRequestObjectResult!.Value as CustomResponse<object>;
+
+			var actualBadRequestResult =
+				CustomResponse<object>.CreateFailureCustomResponse(
+						(int)HttpStatusCode.BadRequest,
+						new List<string> { "You should provide Genre name for update" }
+					);
+
+
+			// Assert
+			actionResult.Should().NotBeNull();
+			badRequestObjectResult.Should().NotBeNull();
+			badRequestValue.Should().NotBeNull();
+			badRequestValue.Should().BeEquivalentTo(actualBadRequestResult);
+		}
+
+		[Fact]
+		public async Task UpdateGenreAsync_ReturnNullGenre_ReturnNotFoundResponse()
+		{
+			// Arrange
+			Genre? emptyGenre = null;
+			A.CallTo(
+				() => _unitOfWork.Genres.GetByExpressionAsync(A<Expression<Func<Genre, bool>>>.Ignored))
+				.Returns(emptyGenre);
+			var genreDto = new GenreRequestDto { Name = "Foo" };
+
+			// Act
+			var actionResult = await _controller.UpdateAsync(1, genreDto);
+			var objectResult = actionResult as NotFoundObjectResult;
+			var objectResultContent = objectResult!.Value as CustomResponse<object>;
+
+			var actualObjectResultContent = CustomResponse<object>
+						.CreateFailureCustomResponse(404, new List<string> { "The Genre ID was not found" });
+
+
+			// Assert
+			Assert.NotNull(actionResult);
+			Assert.NotNull(objectResult);
+			Assert.NotNull(objectResultContent);
+			objectResult.StatusCode.Should().Be((int)HttpStatusCode.NotFound);
+			objectResultContent.Should().BeEquivalentTo(actualObjectResultContent);
+
+
+		}
+
+		[Fact]
+		public async Task UpdateGenreAsync_ReturnGenre_ReturnOkObjectResultResponse()
+		{
+			// Arrange
+			var genre = A.Fake<Genre>();
+			A.
+			  CallTo(() => _unitOfWork.Genres.GetByExpressionAsync(A<Expression<Func<Genre, bool>>>.Ignored))
+			  .Returns(genre);
+
+			// by usin FakeItEasy
+			var dto = A.Fake<GenreRequestDto>();
+			dto.Name = "Foo";
+
+			// Act
+			var actionResult = await _controller.UpdateAsync(1, dto);
+			var objectResult = actionResult as ObjectResult;
+			var contentObjectResult = objectResult!.Value as CustomResponse<Genre>;
+			var actualContent = CustomResponse<Genre>.CreateSuccessCustomResponse(200, genre);
+
+			// Assert
+			actionResult.Should().NotBeNull();
+			objectResult.Should().NotBeNull();
+			contentObjectResult.Should().NotBeNull();
+			objectResult.StatusCode.Should().Be(200);
+			contentObjectResult.Should().BeEquivalentTo(actualContent);
 		}
 	}
 }

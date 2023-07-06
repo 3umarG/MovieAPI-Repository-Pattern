@@ -48,8 +48,8 @@ namespace MoviesApi.Controllers
 				//});
 
 				return new BadRequestObjectResult(
-						CustomResponse<object>.CreateFailureCustomResponse((int)HttpStatusCode.BadRequest ,new List<string> { "You should provide Name for Genre " })
-					) ;
+						CustomResponse<object>.CreateFailureCustomResponse((int)HttpStatusCode.BadRequest, new List<string> { "You should provide Name for Genre " })
+					);
 			}
 			else
 			{
@@ -78,36 +78,27 @@ namespace MoviesApi.Controllers
 		{
 			if (dto.Name.IsNullOrEmpty())
 			{
-				return new BadRequestObjectResult(new CustomResponse<object>()
-				{
-					Status = false,
-					StatusCode = 400,
-					Message = "You should provide Genre name for update"
-				});
+				return new BadRequestObjectResult(
+					CustomResponse<object>
+						.CreateFailureCustomResponse(400, new List<string> { "You should provide Genre name for update" })
+					);
 			}
 
 			//var genre = await _context.Genres.FirstOrDefaultAsync(g => g.ID == id);
 			var genre = await _unitOfWork.Genres.GetByExpressionAsync(G => G.ID == (byte)id);
 			if (genre is null)
 			{
-				return new NotFoundObjectResult(new CustomResponse<object>()
-				{
-					Status = false,
-					StatusCode = 404,
-					Message = $"There is no Genre with ID : {id}"
-				});
+				return new NotFoundObjectResult(
+						CustomResponse<object>
+						.CreateFailureCustomResponse(404, new List<string> { "The Genre ID was not found"})
+					);
 			}
 
-			genre.Name = dto.Name;
+			genre.Name = dto.Name!;
 			_unitOfWork.Complete();
 
 
-			return new OkObjectResult(new CustomResponse<Genre>()
-			{
-				StatusCode = 200,
-				Data = genre,
-				Message = $"Genre with ID : {id} Update Successfully"
-			});
+			return new OkObjectResult(CustomResponse<Genre>.CreateSuccessCustomResponse(200 ,genre));
 		}
 
 
