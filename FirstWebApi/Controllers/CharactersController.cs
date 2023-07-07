@@ -16,10 +16,16 @@ namespace MoviesApi.Controllers
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> GetAllAsync()
+		public IActionResult GetAllAsync()
 		{
-			var characters = await _unitOfWork.Characters.GetAllAsync();
-			return Ok(characters);
+			var characters = _unitOfWork.Characters.GetAllAsync(Ch => new CharacterResponseDto
+			{
+				Id = Ch.ID,
+				FirstName = Ch.CharacterName.FirstName,
+				LastName = Ch.CharacterName.LastName,
+				BirthDate = Ch.BirthDate
+			});
+			return Ok(CustomResponse<List<CharacterResponseDto>>.CreateSuccessCustomResponse(200, characters));
 		}
 
 
@@ -38,13 +44,16 @@ namespace MoviesApi.Controllers
 
 			if (addedRows > 0)
 			{
-				return Ok(new CharacterResponseDto
-				{
-					Id = ch.ID,
-					FirstName = ch.CharacterName.FirstName,
-					LastName = ch.CharacterName.LastName,
-					BirthDate = ch.BirthDate
-				});
+				return Ok(
+						CustomResponse<CharacterResponseDto>.CreateSuccessCustomResponse(200,
+						new CharacterResponseDto
+						{
+							Id = ch.ID,
+							FirstName = ch.CharacterName.FirstName,
+							LastName = ch.CharacterName.LastName,
+							BirthDate = ch.BirthDate
+						})
+					);
 			}
 			return BadRequest();
 		}
@@ -56,7 +65,7 @@ namespace MoviesApi.Controllers
 			var ch = await _unitOfWork.Characters.GetByIdAsync(id);
 			if (ch is null)
 			{
-				return NotFound();
+				return NotFound(CustomResponse<object>.CreateFailureCustomResponse(404, new List<string> { "Not Found Character with the provided ID" }));
 			}
 
 			ch.CharacterName = new Name { FirstName = dto.FirstName, LastName = dto.LastName! };
@@ -68,13 +77,16 @@ namespace MoviesApi.Controllers
 				return BadRequest();
 			}
 
-			return Ok(new CharacterResponseDto
-			{
-				Id = ch.ID,
-				FirstName = ch.CharacterName.FirstName,
-				LastName = ch.CharacterName.LastName,
-				BirthDate = ch.BirthDate
-			});
+			return Ok(
+						CustomResponse<CharacterResponseDto>.CreateSuccessCustomResponse(200,
+						new CharacterResponseDto
+						{
+							Id = ch.ID,
+							FirstName = ch.CharacterName.FirstName,
+							LastName = ch.CharacterName.LastName,
+							BirthDate = ch.BirthDate
+						})
+				);
 		}
 
 
@@ -83,16 +95,22 @@ namespace MoviesApi.Controllers
 		{
 			var ch = await _unitOfWork.Characters.GetByIdAsync(id);
 			if (ch is null)
-				return NotFound();
+				return NotFound(CustomResponse<object>
+					.CreateFailureCustomResponse(
+						404 ,
+						new List<string> { "Not found Character with the provided id"}));
 
 			_unitOfWork.Characters.Delete(ch);
-			return Ok(new CharacterResponseDto
-			{
-				Id = ch.ID,
-				FirstName  = ch.CharacterName.FirstName,
-				LastName = ch.CharacterName.LastName,
-				BirthDate = ch.BirthDate
-			});
+			return Ok(
+				CustomResponse<CharacterResponseDto>
+				.CreateSuccessCustomResponse(200,
+							new CharacterResponseDto
+							{
+								Id = ch.ID,
+								FirstName = ch.CharacterName.FirstName,
+								LastName = ch.CharacterName.LastName,
+								BirthDate = ch.BirthDate
+							}));
 		}
 	}
 }
