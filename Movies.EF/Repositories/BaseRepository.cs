@@ -33,6 +33,7 @@ namespace Movies.EF.Repositories
 		public void Delete(T entity)
 		{
 			_context.Set<T>().Remove(entity);
+			_context.SaveChanges();
 		}
 
 		public async Task<int?> DeleteByIdAsync(int id)
