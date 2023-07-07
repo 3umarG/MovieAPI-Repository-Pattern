@@ -7,7 +7,7 @@
 
         public DateTime BirthDate { get; set; }
 
-		public virtual ICollection<CharacterInMovie> CharacterActInMovies { get; set; }
+		public virtual ICollection<CharacterInMovie> CharacterActInMovies { get; set; } = new HashSet<CharacterInMovie>();
 
     }
 

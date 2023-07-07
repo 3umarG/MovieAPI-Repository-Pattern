@@ -19,11 +19,14 @@ namespace Movies.EF
 			_context = context;
 			Movies = new MoviesRepository(context);
 			Genres = new BaseRepository<Genre>(context);
+			Characters = new CharactersRepository(context);
 		}
 
 		public IMoviesRepository Movies { get; private set; }
 
 		public IBaseRepository<Genre> Genres { get; private set; }
+
+		public ICharactersRepository Characters {get; private set; }
 
 		public int Complete()
 		{

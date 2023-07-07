@@ -18,6 +18,6 @@
 
 		public Genre Genre { get; set; }
 
-		public virtual ICollection<CharacterInMovie> CharacterActInMovies { get; set; }
+		public virtual ICollection<CharacterInMovie> CharacterActInMovies { get; set; } = new HashSet<CharacterInMovie>();
 	}
 }

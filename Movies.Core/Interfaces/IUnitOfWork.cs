@@ -12,6 +12,8 @@ namespace Movies.Core.Interfaces
 		IMoviesRepository Movies { get; }
 		IBaseRepository<Genre> Genres { get; }
 
+		ICharactersRepository Characters { get; }
+
 		int Complete();
 	}
 }
