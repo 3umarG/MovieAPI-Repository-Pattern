@@ -7,6 +7,6 @@ namespace Movies.Core.Models
 
         public string Name { get; set; }
 
-        public virtual ICollection<Movie> Movies { get; set; } = new HashSet<Movie>();
+        public virtual List<Movie> Movies { get; set; } = new List<Movie>();
     }
 }

@@ -13,7 +13,7 @@ namespace MoviesApi.Controllers
 			_unitOfWork = unitOfWork;
 		}
 
-		[HttpGet]
+		[HttpGet("AllGenres")]
 		public async Task<IActionResult> GetAllAsync()
 		{
 			try
@@ -33,6 +33,35 @@ namespace MoviesApi.Controllers
 				return BadRequest();
 			}
 		}
+
+		#region Get All Genres with their Movies End point response error.
+		/*
+		[HttpGet("AllGenresWithTheirMovies")]
+		public IActionResult GetAllGenresWithTheirMovies()
+		{
+			try
+			{
+				//return new OkObjectResult(new CustomResponse<List<Genre>>()
+				//{
+				//	Message = "Get All Genres Successfully .",
+				//	StatusCode = 200,
+				//	Data = await _unitOfWork.Genres.GetAllAsync()
+				//});
+
+				var data = _unitOfWork.Genres.QueryableOf().Include(G => G.Movies).ToList();
+
+                //var response = CustomResponse<List<Genre>>.CreateSuccessCustomResponse(200, data);
+				return  Ok(data);
+			}
+			catch
+			{
+				return BadRequest();
+			}
+		}
+		*/
+		#endregion
+
+
 
 		[HttpPost]
 		public async Task<IActionResult> CreateGenreAsync(GenreRequestDto genre)

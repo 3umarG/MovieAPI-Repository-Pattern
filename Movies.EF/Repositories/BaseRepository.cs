@@ -131,5 +131,22 @@ namespace Movies.EF.Repositories
 
 			return query.FirstOrDefault(expression);
         }
+
+		public async Task<List<T>> GetAllAsync(string[] includes)
+		{
+			IQueryable<T> query = _context.Set<T>();
+
+			foreach(var include in includes)
+			{
+				query = query.Include(include);
+			}
+
+			return  await query.ToListAsync();
+		}
+
+		public IQueryable<T> QueryableOf()
+		{
+			return _context.Set<T>();
+		}
 	}
 }

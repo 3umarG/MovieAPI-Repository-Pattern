@@ -9,7 +9,8 @@ namespace Movies.Core.Interfaces
 {
 	public interface IBaseRepository<T> where T : class
 	{
-		Task<List<T>> GetAllAsync();
+		public Task<List<T>> GetAllAsync();
+		public Task<List<T>> GetAllAsync(string[] includes);
 
 		Task<T?> GetByIdAsync(int id);
 
@@ -33,6 +34,8 @@ namespace Movies.Core.Interfaces
 		List<S> GetAllAsync<S>(Func<T, S> selector);
 		
 		List<S> GetAllAsync<S>(Func<T, S> selector, string[] includes);
+
+		IQueryable<T> QueryableOf();
 
 	}
 }
