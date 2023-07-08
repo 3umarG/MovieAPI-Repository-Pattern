@@ -225,5 +225,34 @@ namespace MoviesApi.Controllers
 			return Ok(movieResultDto);
 		}
 
+
+		[HttpPut("UpdateSalaryForCharacter")]
+		public async Task<IActionResult> UpdateSalaryOfCharacter(int characterId, int movieId, double salary)
+		{
+			try
+			{
+
+				var character = await _unitOfWork.Characters.UpdateSalaryForCharacterInMovieAsync(characterId, movieId, salary);
+
+				if (character is null)
+					return NotFound();
+
+				return Ok(CustomResponse<CharacterWithMovieResponseDto>.CreateSuccessCustomResponse(200,
+
+					new CharacterWithMovieResponseDto
+					{
+						MovieId = character.MovieID,
+						CharacterId = character.CharacterID,
+						Salary = character.Salary
+					}
+					));
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(CustomResponse<object>.CreateFailureCustomResponse(400, new List<string> { ex.Message }));
+			}
+
+
+		}
 	}
 }

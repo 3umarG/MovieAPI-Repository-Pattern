@@ -35,8 +35,8 @@ namespace Movies.EF.Repositories
 			await _context.SaveChangesAsync();
 			return result.Entity;
 		}
-	
-	
+
+
 		public async Task<Character?> GetCharacterWithAllMoviesAsync(int characterId)
 		{
 			var character = await _context
@@ -76,7 +76,35 @@ namespace Movies.EF.Repositories
 
 			return movie;
 
-								
+
+		}
+
+		public async Task<CharacterInMovie?> UpdateSalaryForCharacterInMovieAsync(int characterId, int movieId, double salary)
+		{
+			var isValidCharacter = await _context.Characters.AnyAsync(c => c.ID == characterId);
+			var isValidMovie = await _context.Movies.AnyAsync(m => m.ID == movieId);
+
+			if (!isValidCharacter)
+				throw new Exception("There is no Character with provided ID");
+
+			if (!isValidMovie)
+				throw new Exception("There is no Movie with provided ID");
+
+			var isValidCharacterInMovie = await _context.CharactersInMovies
+														.AnyAsync(cm => cm.CharacterID == characterId && cm.MovieID == movieId);
+
+			if (!isValidCharacterInMovie)
+				throw new Exception("The provided Character doesn't work on the provided Movie");
+
+			if (salary < 0)
+				throw new Exception("The Salary must be Positive value");
+
+			var characterInMovie = await _context.CharactersInMovies
+											.FirstOrDefaultAsync(c => c.CharacterID == characterId && c.MovieID == movieId);
+			characterInMovie!.Salary = salary;
+			await _context.SaveChangesAsync();
+
+			return characterInMovie;
 		}
 	}
 }
