@@ -102,13 +102,7 @@ namespace MoviesApi.Controllers
 
 			}
 			_unitOfWork.Characters.Delete(ch);
-			_successFactory = new SuccessResponseFactory<CharacterResponseDto>(200, new CharacterResponseDto
-			{
-				Id = ch.ID,
-				FirstName = ch.CharacterName.FirstName,
-				LastName = ch.CharacterName.LastName,
-				BirthDate = ch.BirthDate
-			});
+			_successFactory = new SuccessResponseFactory<CharacterResponseDto>(200, _mapper.Map<CharacterResponseDto>(ch));
 			return Ok(_successFactory.Create());
 		}
 
