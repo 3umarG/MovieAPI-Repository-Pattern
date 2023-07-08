@@ -1,4 +1,5 @@
 ﻿using FirstWebApi.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Movies.Core.Interfaces;
 using Movies.Core.Models;
@@ -34,5 +35,35 @@ namespace Movies.EF.Repositories
 			await _context.SaveChangesAsync();
 			return result.Entity;
 		}
+	
+	
+		public async Task<Character?> GetCharacterWithAllMovies(int characterId)
+		{
+			var character = await _context
+								.Characters
+								.Include(c => c.CharacterActInMovies)
+								.ThenInclude(cm => cm.Movie)
+								.ThenInclude(m => m.Genre)
+								.FirstOrDefaultAsync(c => c.ID == characterId);
+			return character;
+
+			#region Return only Movies without the character data
+			/*
+			var isValidId = await _context.Characters.AnyAsync(c => c.ID == characterId);
+			if (!isValidId)
+				return null;
+
+			var movies =  _context
+										.CharactersInMovies
+										.Where(cm => cm.CharacterID == characterId)
+										.Include(cm => cm.Movie)
+										.ThenInclude(m => m.Genre)
+										.Select(cm => cm.Movie);
+
+			return await movies.ToListAsync();
+			*/
+			#endregion
+		}
+
 	}
 }

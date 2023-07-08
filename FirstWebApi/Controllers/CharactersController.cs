@@ -97,8 +97,8 @@ namespace MoviesApi.Controllers
 			if (ch is null)
 				return NotFound(CustomResponse<object>
 					.CreateFailureCustomResponse(
-						404 ,
-						new List<string> { "Not found Character with the provided id"}));
+						404,
+						new List<string> { "Not found Character with the provided id" }));
 
 			_unitOfWork.Characters.Delete(ch);
 			return Ok(
@@ -114,23 +114,81 @@ namespace MoviesApi.Controllers
 		}
 
 		[HttpPost("AddCharacterToMovieWithSalary")]
-		public async Task<IActionResult> AddCharacterWithMovie(int movieId , int characterId , double salary)
+		public async Task<IActionResult> AddCharacterWithMovie(int movieId, int characterId, double salary)
 		{
-			var result = await _unitOfWork.Characters.AddCharacterToMovieWithSalary(characterId,movieId, salary);
+			var result = await _unitOfWork.Characters.AddCharacterToMovieWithSalary(characterId, movieId, salary);
 
-			if(result is null)
+			if (result is null)
 			{
-				return BadRequest(CustomResponse<object>.CreateFailureCustomResponse(400 , new List<string> { "Make sure of the MovieId and CharacterId are exist"}));
+				return BadRequest(CustomResponse<object>.CreateFailureCustomResponse(400, new List<string> { "Make sure of the MovieId and CharacterId are exist" }));
 			}
 
-			var responseDto = new CharacterWithMovieResponseDto { 
+			var responseDto = new CharacterWithMovieResponseDto
+			{
 				CharacterId = result.CharacterID,
 				MovieId = result.MovieID,
 				Salary = result.Salary
-			
+
 			};
 			return Ok(CustomResponse<CharacterWithMovieResponseDto>
-						.CreateSuccessCustomResponse(200 ,responseDto));
+						.CreateSuccessCustomResponse(200, responseDto));
 		}
+
+
+		[HttpGet("CharacterWithAllMovies/{id}")]
+		public async Task<IActionResult> GetCharacterWithAllMoviesAsync(int id)
+		{
+			var ch = await _unitOfWork.Characters.GetCharacterWithAllMovies(id);
+
+			if (ch is null)
+				return NotFound(CustomResponse<object>.CreateFailureCustomResponse(404 , new List<string> { "There is no Character with provided Id"}));
+
+			#region Return only movies without character data
+			//var moviesDto = 
+			//	movies
+			//	.Select(
+			//		m => new MovieResponseDto
+			//		{
+			//			ID = m.ID,
+			//			Genre = new GenreResponseDto
+			//			{
+			//				Id = m.Genre.ID,
+			//				Name = m.Genre.Name,
+			//			},
+			//			Rate = m.Rate,
+			//			StoryLine = m.StoryLine,
+			//			Title = m.Title,
+			//			Year = m.Year
+			//		}
+			//	);
+			#endregion
+
+			var moviesDto = ch.CharacterActInMovies.Select(cm => new MovieResponseDto
+			{
+				ID = cm.Movie.ID,
+				Rate = cm.Movie.Rate,
+				StoryLine = cm.Movie.StoryLine,
+				Title = cm.Movie.Title,
+				Year = cm.Movie.Year,
+				Genre = new GenreResponseDto
+				{
+					Id = cm.Movie.Genre.ID,
+					Name = cm.Movie.Genre.Name,
+				}
+			}).ToList();
+			var dto = new CharacterWithAllMoviesResponseDto
+			{
+				Id = ch.ID,
+				FirstName = ch.CharacterName.FirstName,
+				LastName = ch.CharacterName.LastName,
+				BirthDate = ch.BirthDate,
+				Movies = moviesDto
+			};
+			return Ok(CustomResponse<CharacterWithAllMoviesResponseDto>.CreateSuccessCustomResponse(
+					200 ,
+					dto
+				));
+		}
+
 	}
 }
