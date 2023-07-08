@@ -37,7 +37,7 @@ namespace Movies.EF.Repositories
 		}
 	
 	
-		public async Task<Character?> GetCharacterWithAllMovies(int characterId)
+		public async Task<Character?> GetCharacterWithAllMoviesAsync(int characterId)
 		{
 			var character = await _context
 								.Characters
@@ -65,5 +65,18 @@ namespace Movies.EF.Repositories
 			#endregion
 		}
 
+		public async Task<Movie?> GetMovieWithAllCharactersAsync(int movieId)
+		{
+			var movie = await _context
+								.Movies
+								.Include(M => M.CharacterActInMovies)
+								.ThenInclude(CM => CM.Character)
+								.Include(M => M.Genre)
+								.FirstOrDefaultAsync(m => m.ID == movieId);
+
+			return movie;
+
+								
+		}
 	}
 }

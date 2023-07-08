@@ -138,10 +138,10 @@ namespace MoviesApi.Controllers
 		[HttpGet("CharacterWithAllMovies/{id}")]
 		public async Task<IActionResult> GetCharacterWithAllMoviesAsync(int id)
 		{
-			var ch = await _unitOfWork.Characters.GetCharacterWithAllMovies(id);
+			var ch = await _unitOfWork.Characters.GetCharacterWithAllMoviesAsync(id);
 
 			if (ch is null)
-				return NotFound(CustomResponse<object>.CreateFailureCustomResponse(404 , new List<string> { "There is no Character with provided Id"}));
+				return NotFound(CustomResponse<object>.CreateFailureCustomResponse(404, new List<string> { "There is no Character with provided Id" }));
 
 			#region Return only movies without character data
 			//var moviesDto = 
@@ -185,9 +185,44 @@ namespace MoviesApi.Controllers
 				Movies = moviesDto
 			};
 			return Ok(CustomResponse<CharacterWithAllMoviesResponseDto>.CreateSuccessCustomResponse(
-					200 ,
+					200,
 					dto
 				));
+		}
+
+		[HttpGet("MovieWithAllCharacters/{id}")]
+		public async Task<IActionResult> GetMovieWithAllCharactersAsync(int id)
+		{
+			var movie = await _unitOfWork.Characters.GetMovieWithAllCharactersAsync(id);
+
+			if (movie is null)
+				return NotFound(CustomResponse<object>.CreateFailureCustomResponse(404,
+					new List<string> { "There is no Genre with provided Id" }));
+
+			var charactersDto = movie.CharacterActInMovies.Select(
+					cm => new CharacterResponseDto
+					{
+						Id = cm.Character.ID,
+						BirthDate = cm.Character.BirthDate,
+						FirstName = cm.Character.CharacterName.FirstName,
+						LastName = cm.Character.CharacterName.LastName,
+					}).ToList();
+			var movieResultDto = new MovieWithAllCharacterResponseDto
+			{
+				ID = movie.ID,
+				Rate = movie.Rate,
+				Genre = new GenreResponseDto
+				{
+					Id = movie.Genre.ID,
+					Name = movie.Genre.Name
+				},
+				Title = movie.Title,
+				StoryLine = movie.StoryLine,
+				Year = movie.Year,
+				Characters = charactersDto
+			};
+
+			return Ok(movieResultDto);
 		}
 
 	}

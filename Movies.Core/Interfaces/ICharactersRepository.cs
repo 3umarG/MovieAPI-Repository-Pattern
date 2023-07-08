@@ -11,6 +11,8 @@ namespace Movies.Core.Interfaces
 	{
 		Task<CharacterInMovie?> AddCharacterToMovieWithSalary(int chId, int movieID, double salary);
 
-		Task<Character?> GetCharacterWithAllMovies(int characterId);
+		Task<Character?> GetCharacterWithAllMoviesAsync(int characterId);
+
+		Task<Movie?> GetMovieWithAllCharactersAsync(int movieId);
 	}
 }
