@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Movies.Core.Interfaces;
+using System;
 
 namespace MoviesApi.Controllers
 {
@@ -9,6 +10,8 @@ namespace MoviesApi.Controllers
 	public class CharactersController : ControllerBase
 	{
 		private readonly IUnitOfWork _unitOfWork;
+		private IResponseFactory _successFactory;
+		private IResponseFactory _failureFactory;
 
 		public CharactersController(IUnitOfWork unitOfWork)
 		{
@@ -25,7 +28,8 @@ namespace MoviesApi.Controllers
 				LastName = Ch.CharacterName.LastName,
 				BirthDate = Ch.BirthDate
 			});
-			return Ok(CustomResponse<List<CharacterResponseDto>>.CreateSuccessCustomResponse(200, characters));
+			_successFactory = new SuccessResponseFactory<List<CharacterResponseDto>>(200, characters);
+			return Ok(_successFactory.Create());
 		}
 
 
@@ -44,16 +48,14 @@ namespace MoviesApi.Controllers
 
 			if (addedRows > 0)
 			{
-				return Ok(
-						CustomResponse<CharacterResponseDto>.CreateSuccessCustomResponse(200,
-						new CharacterResponseDto
-						{
-							Id = ch.ID,
-							FirstName = ch.CharacterName.FirstName,
-							LastName = ch.CharacterName.LastName,
-							BirthDate = ch.BirthDate
-						})
-					);
+				_successFactory = new SuccessResponseFactory<CharacterResponseDto>(200, new CharacterResponseDto
+				{
+					Id = ch.ID,
+					FirstName = ch.CharacterName.FirstName,
+					LastName = ch.CharacterName.LastName,
+					BirthDate = ch.BirthDate
+				});
+				return Ok(_successFactory.Create());
 			}
 			return BadRequest();
 		}
@@ -65,7 +67,8 @@ namespace MoviesApi.Controllers
 			var ch = await _unitOfWork.Characters.GetByIdAsync(id);
 			if (ch is null)
 			{
-				return NotFound(CustomResponse<object>.CreateFailureCustomResponse(404, new List<string> { "Not Found Character with the provided ID" }));
+				_failureFactory = new FailureResponseFactory(404, "Not Found Character with the provided ID");
+				return NotFound(_failureFactory.Create());
 			}
 
 			ch.CharacterName = new Name { FirstName = dto.FirstName, LastName = dto.LastName! };
@@ -77,16 +80,15 @@ namespace MoviesApi.Controllers
 				return BadRequest();
 			}
 
-			return Ok(
-						CustomResponse<CharacterResponseDto>.CreateSuccessCustomResponse(200,
-						new CharacterResponseDto
-						{
-							Id = ch.ID,
-							FirstName = ch.CharacterName.FirstName,
-							LastName = ch.CharacterName.LastName,
-							BirthDate = ch.BirthDate
-						})
-				);
+			_successFactory = new SuccessResponseFactory<CharacterResponseDto>(200, new CharacterResponseDto
+			{
+				Id = ch.ID,
+				FirstName = ch.CharacterName.FirstName,
+				LastName = ch.CharacterName.LastName,
+				BirthDate = ch.BirthDate
+			});
+
+			return Ok(_successFactory.Create());
 		}
 
 
@@ -95,22 +97,20 @@ namespace MoviesApi.Controllers
 		{
 			var ch = await _unitOfWork.Characters.GetByIdAsync(id);
 			if (ch is null)
-				return NotFound(CustomResponse<object>
-					.CreateFailureCustomResponse(
-						404,
-						new List<string> { "Not found Character with the provided id" }));
+			{
+				_failureFactory = new FailureResponseFactory(404, "Not found Character with the provided id");
+				return NotFound(_failureFactory.Create());
 
+			}
 			_unitOfWork.Characters.Delete(ch);
-			return Ok(
-				CustomResponse<CharacterResponseDto>
-				.CreateSuccessCustomResponse(200,
-							new CharacterResponseDto
-							{
-								Id = ch.ID,
-								FirstName = ch.CharacterName.FirstName,
-								LastName = ch.CharacterName.LastName,
-								BirthDate = ch.BirthDate
-							}));
+			_successFactory = new SuccessResponseFactory<CharacterResponseDto>(200, new CharacterResponseDto
+				{
+					Id = ch.ID,
+					FirstName = ch.CharacterName.FirstName,
+					LastName = ch.CharacterName.LastName,
+					BirthDate = ch.BirthDate
+				});
+			return Ok(_successFactory.Create());
 		}
 
 		[HttpPost("AddCharacterToMovieWithSalary")]
@@ -120,7 +120,8 @@ namespace MoviesApi.Controllers
 
 			if (result is null)
 			{
-				return BadRequest(CustomResponse<object>.CreateFailureCustomResponse(400, new List<string> { "Make sure of the MovieId and CharacterId are exist" }));
+				_failureFactory = new FailureResponseFactory(400, "Make sure of the MovieId and CharacterId are exist");
+				return BadRequest(_failureFactory.Create());
 			}
 
 			var responseDto = new CharacterWithMovieResponseDto
@@ -130,8 +131,8 @@ namespace MoviesApi.Controllers
 				Salary = result.Salary
 
 			};
-			return Ok(CustomResponse<CharacterWithMovieResponseDto>
-						.CreateSuccessCustomResponse(200, responseDto));
+			_successFactory = new SuccessResponseFactory<CharacterWithMovieResponseDto>(200, responseDto);
+			return Ok(_successFactory.Create());
 		}
 
 
@@ -141,7 +142,10 @@ namespace MoviesApi.Controllers
 			var ch = await _unitOfWork.Characters.GetCharacterWithAllMoviesAsync(id);
 
 			if (ch is null)
-				return NotFound(CustomResponse<object>.CreateFailureCustomResponse(404, new List<string> { "There is no Character with provided Id" }));
+			{
+				_failureFactory = new FailureResponseFactory(404, "There is no Character with provided Id");
+				return NotFound(_failureFactory.Create());
+			}
 
 			#region Return only movies without character data
 			//var moviesDto = 
@@ -184,10 +188,8 @@ namespace MoviesApi.Controllers
 				BirthDate = ch.BirthDate,
 				Movies = moviesDto
 			};
-			return Ok(CustomResponse<CharacterWithAllMoviesResponseDto>.CreateSuccessCustomResponse(
-					200,
-					dto
-				));
+			_successFactory = new SuccessResponseFactory<CharacterWithAllMoviesResponseDto>(200, dto);
+			return Ok(_successFactory.Create());
 		}
 
 		[HttpGet("MovieWithAllCharacters/{id}")]
@@ -196,8 +198,10 @@ namespace MoviesApi.Controllers
 			var movie = await _unitOfWork.Characters.GetMovieWithAllCharactersAsync(id);
 
 			if (movie is null)
-				return NotFound(CustomResponse<object>.CreateFailureCustomResponse(404,
-					new List<string> { "There is no Genre with provided Id" }));
+			{
+				_failureFactory = new FailureResponseFactory(404, "There is no Movie with provided Id");
+				return NotFound(_failureFactory.Create());
+			}
 
 			var charactersDto = movie.CharacterActInMovies.Select(
 					cm => new CharacterResponseDto
@@ -222,7 +226,8 @@ namespace MoviesApi.Controllers
 				Characters = charactersDto
 			};
 
-			return Ok(movieResultDto);
+			_successFactory = new SuccessResponseFactory<MovieWithAllCharacterResponseDto>(200, movieResultDto);
+			return Ok(_successFactory.Create());
 		}
 
 
@@ -235,21 +240,24 @@ namespace MoviesApi.Controllers
 				var character = await _unitOfWork.Characters.UpdateSalaryForCharacterInMovieAsync(characterId, movieId, salary);
 
 				if (character is null)
-					return NotFound();
+				{
+					_failureFactory = new FailureResponseFactory(404, "Failed");
+					return NotFound(_failureFactory.Create());
+				}
 
-				return Ok(CustomResponse<CharacterWithMovieResponseDto>.CreateSuccessCustomResponse(200,
-
-					new CharacterWithMovieResponseDto
-					{
-						MovieId = character.MovieID,
-						CharacterId = character.CharacterID,
-						Salary = character.Salary
-					}
-					));
+				_successFactory = new SuccessResponseFactory<CharacterWithMovieResponseDto>
+					(200, new CharacterWithMovieResponseDto
+						{
+							MovieId = character.MovieID,
+							CharacterId = character.CharacterID,
+							Salary = character.Salary
+						});
+				return Ok(_successFactory.Create());
 			}
 			catch (Exception ex)
 			{
-				return BadRequest(CustomResponse<object>.CreateFailureCustomResponse(400, new List<string> { ex.Message }));
+				_failureFactory = new FailureResponseFactory(400, ex.Message);
+				return BadRequest(_failureFactory.Create());
 			}
 
 

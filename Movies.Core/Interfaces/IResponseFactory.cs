@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace Movies.Core.Interfaces
 {
-	internal interface IResponseFactory
+	public interface IResponseFactory
 	{
+		public IResponse Create();
 	}
 }
