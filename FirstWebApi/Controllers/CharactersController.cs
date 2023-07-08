@@ -33,11 +33,8 @@ namespace MoviesApi.Controllers
 		[HttpPost]
 		public async Task<IActionResult> AddCharacterAsync([FromForm] CharacterRequestDto dto)
 		{
-			var ch = new Character
-			{
-				CharacterName = new Name { FirstName = dto.FirstName, LastName = dto.LastName! },
-				BirthDate = dto.BirthDate
-			};
+			var ch = _mapper.Map<Character>(dto);
+
 			var addedRows = await _unitOfWork.Characters.AddAsync(
 					ch
 				);
@@ -45,13 +42,10 @@ namespace MoviesApi.Controllers
 
 			if (addedRows > 0)
 			{
-				_successFactory = new SuccessResponseFactory<CharacterResponseDto>(200, new CharacterResponseDto
-				{
-					Id = ch.ID,
-					FirstName = ch.CharacterName.FirstName,
-					LastName = ch.CharacterName.LastName,
-					BirthDate = ch.BirthDate
-				});
+				_successFactory = new SuccessResponseFactory<CharacterResponseDto>(
+						200,
+						_mapper.Map<CharacterResponseDto>(ch)
+				);
 				return Ok(_successFactory.Create());
 			}
 			return BadRequest();
