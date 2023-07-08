@@ -62,8 +62,13 @@ namespace MoviesApi.Controllers
 				return NotFound(_failureFactory.Create());
 			}
 
+			// Before use AutoMapper :
 			ch.CharacterName = new Name { FirstName = dto.FirstName, LastName = dto.LastName! };
 			ch.BirthDate = dto.BirthDate;
+
+			// with using AutoMapper :
+			// BUG : with using this approach , you create new instance and instead of updating it , you will insert new one. 
+			//ch = _mapper.Map<Character>(dto);
 
 			var updatedCh = _unitOfWork.Characters.Update(ch);
 			if (updatedCh is null)
@@ -71,13 +76,7 @@ namespace MoviesApi.Controllers
 				return BadRequest();
 			}
 
-			_successFactory = new SuccessResponseFactory<CharacterResponseDto>(200, new CharacterResponseDto
-			{
-				Id = ch.ID,
-				FirstName = ch.CharacterName.FirstName,
-				LastName = ch.CharacterName.LastName,
-				BirthDate = ch.BirthDate
-			});
+			_successFactory = new SuccessResponseFactory<CharacterResponseDto>(200, _mapper.Map<CharacterResponseDto>(ch));
 
 			return Ok(_successFactory.Create());
 		}
