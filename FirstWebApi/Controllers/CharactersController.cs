@@ -63,8 +63,17 @@ namespace MoviesApi.Controllers
 			}
 
 			// Before use AutoMapper :
-			ch.CharacterName = new Name { FirstName = dto.FirstName, LastName = dto.LastName! };
-			ch.BirthDate = dto.BirthDate;
+			if (dto.FirstName != null || dto.LastName != null)
+			{
+				if (dto.FirstName != null)
+					ch.CharacterName.FirstName = dto.FirstName;
+
+				if (dto.LastName != null)
+					ch.CharacterName.LastName = dto.LastName;
+			}
+
+			if (dto.BirthDate is not null)
+				ch.BirthDate = dto.BirthDate.Value;
 
 			// with using AutoMapper :
 			// BUG : with using this approach , you create new instance and instead of updating it , you will insert new one. 
