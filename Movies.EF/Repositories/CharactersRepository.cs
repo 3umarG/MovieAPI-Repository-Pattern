@@ -1,4 +1,5 @@
 ﻿using FirstWebApi.Models;
+using Microsoft.EntityFrameworkCore.Query;
 using Movies.Core.Interfaces;
 using Movies.Core.Models;
 using System;
@@ -15,6 +16,23 @@ namespace Movies.EF.Repositories
 		public CharactersRepository(ApplicationDbContext context) : base(context)
 		{
 			_context = context;
+		}
+
+		public async Task<CharacterInMovie?> AddCharacterToMovieWithSalary(int chId, int movieID, double salary)
+		{
+			var isValidCharacter = _context.Characters.Any(c => c.ID == chId);
+			var isValidMovie = _context.Movies.Any(m => m.ID == movieID);
+
+			if (!isValidCharacter || !isValidMovie)
+			{
+				return null;
+			}
+
+
+			var chWithMovie = new CharacterInMovie { CharacterID = chId, MovieID = movieID, Salary = salary };
+			var result = await _context.CharactersInMovies.AddAsync(chWithMovie);
+			await _context.SaveChangesAsync();
+			return result.Entity;
 		}
 	}
 }

@@ -9,6 +9,6 @@ namespace Movies.Core.Interfaces
 {
 	public interface ICharactersRepository : IBaseRepository<Character>
 	{
-
+		Task<CharacterInMovie?> AddCharacterToMovieWithSalary(int chId, int movieID, double salary);
 	}
 }
