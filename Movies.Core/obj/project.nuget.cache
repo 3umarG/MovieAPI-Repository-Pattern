@@ -1,11 +1,14 @@
 {
   "version": 2,
-  "dgSpecHash": "2DiIn+lwXmL+WbGuU4b8+M5ti0uzMFs/5vwxjWOP0BmVmeo2L+E+9YqZPkfGnJVScq95YzyI/PlzroSY2TilTQ==",
+  "dgSpecHash": "bbq0awwPnld6+Hw59Cp/AjcgW4ziKvsvy7GwMeXdhu74AlwDsPIFmLxD8ipFHLjo5696LjGVp1z8fOZ1rbeATw==",
   "success": true,
   "projectFilePath": "D:\\CS_projects\\WebApi\\Movies.Core\\Movies.Core.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\Ghost\\.nuget\\packages\\automapper\\12.0.1\\automapper.12.0.1.nupkg.sha512",
+    "C:\\Users\\Ghost\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\12.0.1\\automapper.extensions.microsoft.dependencyinjection.12.0.1.nupkg.sha512",
     "C:\\Users\\Ghost\\.nuget\\packages\\mathnet.numerics\\5.0.0\\mathnet.numerics.5.0.0.nupkg.sha512",
     "C:\\Users\\Ghost\\.nuget\\packages\\microsoft.aspnetcore.http.features\\5.0.17\\microsoft.aspnetcore.http.features.5.0.17.nupkg.sha512",
+    "C:\\Users\\Ghost\\.nuget\\packages\\microsoft.csharp\\4.7.0\\microsoft.csharp.4.7.0.nupkg.sha512",
     "C:\\Users\\Ghost\\.nuget\\packages\\microsoft.entityframeworkcore\\7.0.8\\microsoft.entityframeworkcore.7.0.8.nupkg.sha512",
     "C:\\Users\\Ghost\\.nuget\\packages\\microsoft.entityframeworkcore.abstractions\\7.0.8\\microsoft.entityframeworkcore.abstractions.7.0.8.nupkg.sha512",
     "C:\\Users\\Ghost\\.nuget\\packages\\microsoft.entityframeworkcore.analyzers\\7.0.8\\microsoft.entityframeworkcore.analyzers.7.0.8.nupkg.sha512",
