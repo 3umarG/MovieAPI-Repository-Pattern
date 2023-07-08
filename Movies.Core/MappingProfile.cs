@@ -64,6 +64,41 @@ namespace Movies.Core
 				.ForPath(d => d.CharacterName.FirstName, s => s.MapFrom(s => s.FirstName))
 				.ForPath(d => d.CharacterName.LastName, s => s.MapFrom(s => s.LastName));
 
+
+
+			/*
+			 *  CharacterWithMovieResponseDto
+	
+					public int MovieId { get; set; }
+
+					public int CharacterId { get; set; }
+
+					public double Salary { get; set; }
+			 * 
+			 * 
+			 */
+
+
+			/*
+			 * CharacterInMovie
+	
+				public int CharacterID { get; set; }
+
+				public int MovieID { get; set; }
+
+				public double Salary { get; set; }
+
+				public virtual Character Character { get; set; }
+				
+				public virtual Movie Movie { get; set; }
+			 * 
+			 * 
+			 * 
+			 */
+
+			CreateMap<CharacterInMovie, CharacterWithMovieResponseDto>()
+				.ForMember(d => d.MovieId , s => s.MapFrom(s => s.MovieID))
+				.ForMember(d => d.CharacterId , s => s.MapFrom(s => s.CharacterID));
 		}
 	}
 }

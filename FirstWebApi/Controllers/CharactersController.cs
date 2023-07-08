@@ -117,13 +117,8 @@ namespace MoviesApi.Controllers
 				return BadRequest(_failureFactory.Create());
 			}
 
-			var responseDto = new CharacterWithMovieResponseDto
-			{
-				CharacterId = result.CharacterID,
-				MovieId = result.MovieID,
-				Salary = result.Salary
+			var responseDto = _mapper.Map<CharacterWithMovieResponseDto>(result);
 
-			};
 			_successFactory = new SuccessResponseFactory<CharacterWithMovieResponseDto>(200, responseDto);
 			return Ok(_successFactory.Create());
 		}
