@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Movies.Core.Interfaces;
 using System;
@@ -12,23 +13,19 @@ namespace MoviesApi.Controllers
 		private readonly IUnitOfWork _unitOfWork;
 		private IResponseFactory _successFactory;
 		private IResponseFactory _failureFactory;
+		private readonly IMapper _mapper;
 
-		public CharactersController(IUnitOfWork unitOfWork)
+		public CharactersController(IUnitOfWork unitOfWork, IMapper mapper)
 		{
 			_unitOfWork = unitOfWork;
+			_mapper = mapper;
 		}
 
 		[HttpGet]
-		public IActionResult GetAllAsync()
+		public async Task<IActionResult> GetAllAsync()
 		{
-			var characters = _unitOfWork.Characters.GetAllAsync(Ch => new CharacterResponseDto
-			{
-				Id = Ch.ID,
-				FirstName = Ch.CharacterName.FirstName,
-				LastName = Ch.CharacterName.LastName,
-				BirthDate = Ch.BirthDate
-			});
-			_successFactory = new SuccessResponseFactory<List<CharacterResponseDto>>(200, characters);
+			var characters = await _unitOfWork.Characters.GetAllAsync();
+			_successFactory = new SuccessResponseFactory<List<CharacterResponseDto>>(200, _mapper.Map<List<CharacterResponseDto>>(characters));
 			return Ok(_successFactory.Create());
 		}
 
@@ -104,12 +101,12 @@ namespace MoviesApi.Controllers
 			}
 			_unitOfWork.Characters.Delete(ch);
 			_successFactory = new SuccessResponseFactory<CharacterResponseDto>(200, new CharacterResponseDto
-				{
-					Id = ch.ID,
-					FirstName = ch.CharacterName.FirstName,
-					LastName = ch.CharacterName.LastName,
-					BirthDate = ch.BirthDate
-				});
+			{
+				Id = ch.ID,
+				FirstName = ch.CharacterName.FirstName,
+				LastName = ch.CharacterName.LastName,
+				BirthDate = ch.BirthDate
+			});
 			return Ok(_successFactory.Create());
 		}
 
@@ -247,11 +244,11 @@ namespace MoviesApi.Controllers
 
 				_successFactory = new SuccessResponseFactory<CharacterWithMovieResponseDto>
 					(200, new CharacterWithMovieResponseDto
-						{
-							MovieId = character.MovieID,
-							CharacterId = character.CharacterID,
-							Salary = character.Salary
-						});
+					{
+						MovieId = character.MovieID,
+						CharacterId = character.CharacterID,
+						Salary = character.Salary
+					});
 				return Ok(_successFactory.Create());
 			}
 			catch (Exception ex)

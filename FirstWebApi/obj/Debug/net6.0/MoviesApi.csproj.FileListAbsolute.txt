@@ -91,3 +91,5 @@ D:\CS_projects\WebApi\FirstWebApi\bin\Debug\net6.0\Movies.Core.dll
 D:\CS_projects\WebApi\FirstWebApi\bin\Debug\net6.0\Movies.EF.dll
 D:\CS_projects\WebApi\FirstWebApi\bin\Debug\net6.0\Movies.Core.pdb
 D:\CS_projects\WebApi\FirstWebApi\bin\Debug\net6.0\Movies.EF.pdb
+D:\CS_projects\WebApi\FirstWebApi\bin\Debug\net6.0\AutoMapper.dll
+D:\CS_projects\WebApi\FirstWebApi\bin\Debug\net6.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
