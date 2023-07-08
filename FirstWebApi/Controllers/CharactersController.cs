@@ -112,5 +112,25 @@ namespace MoviesApi.Controllers
 								BirthDate = ch.BirthDate
 							}));
 		}
+
+		[HttpPost("AddCharacterToMovieWithSalary")]
+		public async Task<IActionResult> AddCharacterWithMovie(int movieId , int characterId , double salary)
+		{
+			var result = await _unitOfWork.Characters.AddCharacterToMovieWithSalary(characterId,movieId, salary);
+
+			if(result is null)
+			{
+				return BadRequest(CustomResponse<object>.CreateFailureCustomResponse(400 , new List<string> { "Make sure of the MovieId and CharacterId are exist"}));
+			}
+
+			var responseDto = new CharacterWithMovieResponseDto { 
+				CharacterId = result.CharacterID,
+				MovieId = result.MovieID,
+				Salary = result.Salary
+			
+			};
+			return Ok(CustomResponse<CharacterWithMovieResponseDto>
+						.CreateSuccessCustomResponse(200 ,responseDto));
+		}
 	}
 }
