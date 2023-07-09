@@ -11,6 +11,7 @@ namespace Movies.Core.Interfaces
 	{
 		IMoviesRepository Movies { get; }
 		IBaseRepository<Genre> Genres { get; }
+		IBaseRepository<CharacterInMovie> CharactersInMovies { get; }
 
 		ICharactersRepository Characters { get; }
 

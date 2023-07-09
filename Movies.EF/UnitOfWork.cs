@@ -20,6 +20,7 @@ namespace Movies.EF
 			Movies = new MoviesRepository(context);
 			Genres = new BaseRepository<Genre>(context);
 			Characters = new CharactersRepository(context);
+			CharactersInMovies = new BaseRepository<CharacterInMovie>(context);
 		}
 
 		public IMoviesRepository Movies { get; private set; }
@@ -27,6 +28,8 @@ namespace Movies.EF
 		public IBaseRepository<Genre> Genres { get; private set; }
 
 		public ICharactersRepository Characters {get; private set; }
+
+		public IBaseRepository<CharacterInMovie> CharactersInMovies { get; private set; }
 
 		public int Complete()
 		{
