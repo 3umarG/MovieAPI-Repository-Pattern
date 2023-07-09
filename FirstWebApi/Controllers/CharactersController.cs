@@ -22,6 +22,7 @@ namespace MoviesApi.Controllers
 			_mapper = mapper;
 		}
 
+		[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResponse<List<CharacterResponseDto>>))]
 		[HttpGet]
 		public async Task<IActionResult> GetAllAsync()
 		{
@@ -31,6 +32,8 @@ namespace MoviesApi.Controllers
 		}
 
 
+		[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResponse<CharacterResponseDto>))]
+		[ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(FailureResponse))]
 		[HttpPost]
 		public async Task<IActionResult> AddCharacterAsync([FromForm] CharacterRequestDto dto)
 		{
@@ -53,6 +56,8 @@ namespace MoviesApi.Controllers
 		}
 
 
+		[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResponse<CharacterResponseDto>))]
+		[ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(FailureResponse))]
 		[HttpPut("{id}")]
 		public async Task<IActionResult> UpdateCharacterAsync(int id, [FromForm] CharacterRequestDto dto)
 		{
@@ -92,6 +97,8 @@ namespace MoviesApi.Controllers
 		}
 
 
+		[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResponse<CharacterResponseDto>))]
+		[ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(FailureResponse))]
 		[HttpDelete("{id}")]
 		public async Task<IActionResult> DeleteAsync(int id)
 		{
@@ -107,6 +114,10 @@ namespace MoviesApi.Controllers
 			return Ok(_successFactory.Create());
 		}
 
+
+
+		[ProducesResponseType(StatusCodes.Status400BadRequest , Type =typeof(FailureResponse))]
+		[ProducesResponseType(StatusCodes.Status200OK , Type =typeof(SuccessResponse<CharacterWithMovieResponseDto>))]
 		[HttpPost("AddCharacterToMovieWithSalary")]
 		public async Task<IActionResult> AddCharacterWithMovie(int movieId, int characterId, double salary)
 		{
@@ -125,6 +136,8 @@ namespace MoviesApi.Controllers
 		}
 
 
+		[ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(FailureResponse))]
+		[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResponse<CharacterWithAllMoviesResponseDto>))]
 		[HttpGet("CharacterWithAllMovies/{id}")]
 		public async Task<IActionResult> GetCharacterWithAllMoviesAsync(int id)
 		{
@@ -177,6 +190,10 @@ namespace MoviesApi.Controllers
 			return Ok(_successFactory.Create());
 		}
 
+
+
+		[ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(FailureResponse))]
+		[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResponse<MovieWithAllCharacterResponseDto>))]
 		[HttpGet("MovieWithAllCharacters/{id}")]
 		public async Task<IActionResult> GetMovieWithAllCharactersAsync(int id)
 		{
@@ -221,6 +238,9 @@ namespace MoviesApi.Controllers
 		}
 
 
+		[ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(FailureResponse))]
+		[ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(FailureResponse))]
+		[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResponse<CharacterWithMovieResponseDto>))]
 		[HttpPut("UpdateSalaryForCharacter")]
 		public async Task<IActionResult> UpdateSalaryOfCharacter(int characterId, int movieId, double salary)
 		{
