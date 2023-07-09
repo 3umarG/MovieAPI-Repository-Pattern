@@ -128,7 +128,8 @@ namespace MoviesApi.Controllers
 		[HttpGet("CharacterWithAllMovies/{id}")]
 		public async Task<IActionResult> GetCharacterWithAllMoviesAsync(int id)
 		{
-			var ch = await _unitOfWork.Characters.GetCharacterWithAllMoviesAsync(id);
+			// with all includes
+			Character? ch = await _unitOfWork.Characters.GetCharacterWithAllMoviesAsync(id);
 
 			if (ch is null)
 			{
@@ -156,17 +157,23 @@ namespace MoviesApi.Controllers
 			//	);
 			#endregion
 
-			var movies = ch.CharacterActInMovies.Select(cm =>cm.Movie).ToList();
-			var moviesDto = _mapper.Map<List<MovieResponseDto>>(movies);
-			var dto = new CharacterWithAllMoviesResponseDto
-			{
-				Id = ch.ID,
-				FirstName = ch.CharacterName.FirstName,
-				LastName = ch.CharacterName.LastName,
-				BirthDate = ch.BirthDate,
-				Movies = moviesDto
-			};
-			_successFactory = new SuccessResponseFactory<CharacterWithAllMoviesResponseDto>(200, dto);
+			#region Before Using AutoMapper
+			//var movies = ch.CharacterActInMovies.Select(cm =>cm.Movie).ToList();
+			//var moviesDto = _mapper.Map<List<MovieResponseDto>>(movies);
+			//var dto = new CharacterWithAllMoviesResponseDto
+			//{
+			//	Id = ch.ID,
+			//	FirstName = ch.CharacterName.FirstName,
+			//	LastName = ch.CharacterName.LastName,
+			//	BirthDate = ch.BirthDate,
+			//	Movies = moviesDto
+			//};
+			#endregion
+
+			_successFactory = new SuccessResponseFactory<CharacterWithAllMoviesResponseDto>(
+						200,
+						_mapper.Map<CharacterWithAllMoviesResponseDto>(ch)
+			);
 			return Ok(_successFactory.Create());
 		}
 
