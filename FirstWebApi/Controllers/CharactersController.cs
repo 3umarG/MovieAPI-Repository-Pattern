@@ -236,12 +236,7 @@ namespace MoviesApi.Controllers
 				}
 
 				_successFactory = new SuccessResponseFactory<CharacterWithMovieResponseDto>
-					(200, new CharacterWithMovieResponseDto
-					{
-						MovieId = character.MovieID,
-						CharacterId = character.CharacterID,
-						Salary = character.Salary
-					});
+					(200, _mapper.Map<CharacterWithMovieResponseDto>(character));
 				return Ok(_successFactory.Create());
 			}
 			catch (Exception ex)
