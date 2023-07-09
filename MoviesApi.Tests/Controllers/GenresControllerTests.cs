@@ -1,4 +1,5 @@
-﻿using Castle.Core.Internal;
+﻿using AutoMapper;
+using Castle.Core.Internal;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
@@ -23,11 +24,13 @@ namespace MoviesApi.Tests.Controllers
 	{
 		private readonly GenresController _controller;
 		private readonly IUnitOfWork _unitOfWork;
+		private readonly IMapper _mapper;
 
 		public GenresControllerTests()
 		{
+			_mapper = A.Fake<IMapper>();
 			_unitOfWork = A.Fake<IUnitOfWork>();
-			_controller = new GenresController(_unitOfWork);
+			_controller = new GenresController(_unitOfWork , _mapper);
 		}
 		/*
 		 * Naming your tests
@@ -51,9 +54,10 @@ namespace MoviesApi.Tests.Controllers
 			// Act : extract the actual result and expected .
 			var actionResult = await _controller.GetAllAsync();
 			var okObjectResult = actionResult as OkObjectResult;
-			var okObjectResultValue = okObjectResult!.Value as CustomResponse<List<Genre>>;
+			var okObjectResultValue = okObjectResult!.Value as SuccessResponse<List<GenreResponseDto>>;
 
-			var expectedResult = CustomResponse<List<Genre>>.CreateSuccessCustomResponse(200, genres);
+			var successFactory = new SuccessResponseFactory<List<GenreResponseDto>>(200, _mapper.Map<List<GenreResponseDto>>(genres));
+			var expectedResult = successFactory.Create();
 
 
 			// Assert : compare the accepted result with the expected.
@@ -65,7 +69,7 @@ namespace MoviesApi.Tests.Controllers
 		}
 
 		[Fact]
-		public async Task GetAllAsync_AcceptEmpteGenresList_ReturnOkObject()
+		public async Task GetAllAsync_AcceptEmptyGenresList_ReturnOkObject()
 		{
 			/// A A A
 
@@ -74,13 +78,12 @@ namespace MoviesApi.Tests.Controllers
 			A.CallTo(() => _unitOfWork.Genres.GetAllAsync()).Returns(new List<Genre> { });
 
 			// Act : extract the actual result and expected .
-			IActionResult actionResult = await _controller.GetAllAsync();
-			OkObjectResult? okObjectResult = actionResult as OkObjectResult;
-			CustomResponse<List<Genre>>? okObjectResultValue = okObjectResult!.Value as CustomResponse<List<Genre>>;
+			var actionResult = await _controller.GetAllAsync();
+			var okObjectResult = actionResult as OkObjectResult;
+			var okObjectResultValue = okObjectResult!.Value as SuccessResponse<List<GenreResponseDto>>;
 
-			CustomResponse<List<Genre>> expectedResult =
-				CustomResponse<List<Genre>>.CreateSuccessCustomResponse(200, new List<Genre> { });
-
+			var successFactory = new SuccessResponseFactory<List<GenreResponseDto>>(200 , _mapper.Map<List<GenreResponseDto>>(new() { }));
+			var expectedResult = successFactory.Create();
 
 			// Assert : compare the accepted result with the expected.
 			Assert.NotNull(actionResult);
@@ -121,13 +124,10 @@ namespace MoviesApi.Tests.Controllers
 			// Act
 			var actionResult = await _controller.CreateGenreAsync(genreDto);
 			var badRequestObjectResult = actionResult as BadRequestObjectResult;
-			var badRequestValue = badRequestObjectResult!.Value as CustomResponse<object>;
+			var badRequestValue = badRequestObjectResult!.Value as IResponse;
 
-			var actualBadRequestResult =
-				CustomResponse<object>.CreateFailureCustomResponse(
-						(int)HttpStatusCode.BadRequest,
-						new List<string> { "You should provide Name for Genre " }
-					);
+			var failureFactory = new FailureResponseFactory(400, "You should provide Name for Genre");
+			var actualBadRequestResult = failureFactory.Create();
 
 
 			// Assert
@@ -149,17 +149,10 @@ namespace MoviesApi.Tests.Controllers
 			// Act
 			var actionResult = await _controller.CreateGenreAsync(genreDto);
 			var createObjectResult = actionResult as ObjectResult;
-			var objectResultContent = createObjectResult!.Value as CustomResponse<Genre>;
+			var objectResultContent = createObjectResult!.Value as SuccessResponse<Genre>;
 
-			var expectedObjectResultContent = CustomResponse<Genre>.CreateSuccessCustomResponse(
-
-				(int)HttpStatusCode.Created,
-				new Genre
-				{
-					Name = genreDto.Name!
-				}
-			);
-
+			var successFactory = new SuccessResponseFactory<Genre>(201, _mapper.Map<Genre>(genreDto));
+			var expectedObjectResultContent = successFactory.Create();
 
 			// Assert
 			actionResult.Should().NotBeNull();
@@ -183,13 +176,10 @@ namespace MoviesApi.Tests.Controllers
 			// Act
 			var actionResult = await _controller.UpdateAsync(1, genreDto);
 			var badRequestObjectResult = actionResult as BadRequestObjectResult;
-			var badRequestValue = badRequestObjectResult!.Value as CustomResponse<object>;
+			var badRequestValue = badRequestObjectResult!.Value as IResponse;
 
-			var actualBadRequestResult =
-				CustomResponse<object>.CreateFailureCustomResponse(
-						(int)HttpStatusCode.BadRequest,
-						new List<string> { "You should provide Genre name for update" }
-					);
+			var failureFactory = new FailureResponseFactory(400, "You should provide Genre name for update");
+			var actualBadRequestResult = failureFactory.Create();
 
 
 			// Assert
@@ -212,10 +202,11 @@ namespace MoviesApi.Tests.Controllers
 			// Act
 			var actionResult = await _controller.UpdateAsync(1, genreDto);
 			var objectResult = actionResult as NotFoundObjectResult;
-			var objectResultContent = objectResult!.Value as CustomResponse<object>;
+			var objectResultContent = objectResult!.Value as IResponse;
 
-			var actualObjectResultContent = CustomResponse<object>
-						.CreateFailureCustomResponse(404, new List<string> { "The Genre ID was not found" });
+			var failureFact = new FailureResponseFactory(404, "The Genre ID was not found");
+			var actualObjectResultContent = failureFact.Create();
+
 
 
 			// Assert
@@ -244,8 +235,10 @@ namespace MoviesApi.Tests.Controllers
 			// Act
 			var actionResult = await _controller.UpdateAsync(1, dto);
 			var objectResult = actionResult as ObjectResult;
-			var contentObjectResult = objectResult!.Value as CustomResponse<Genre>;
-			var actualContent = CustomResponse<Genre>.CreateSuccessCustomResponse(200, genre);
+			var contentObjectResult = objectResult!.Value as SuccessResponse<GenreResponseDto>;
+
+			var successFactory = new SuccessResponseFactory<GenreResponseDto>(200, _mapper.Map<GenreResponseDto>(genre)); 
+			var actualContent = successFactory.Create();
 
 			// Assert
 			actionResult.Should().NotBeNull();
@@ -268,8 +261,10 @@ namespace MoviesApi.Tests.Controllers
 			// Act
 			var actionResult = await _controller.DeleteAsync(1);
 			var objectResult = actionResult as NotFoundObjectResult;
-			var contentResult = objectResult!.Value as CustomResponse<object>;
-			var expectedContentResult = CustomResponse<object>.CreateFailureCustomResponse(404, new List<string> { "There is No Genre with the provided Id" });
+			var contentResult = objectResult!.Value as IResponse;
+
+			var failureFactory = new FailureResponseFactory(404, "There is No Genre with the provided Id");
+			var expectedContentResult = failureFactory.Create();
 			var expectedStatusCode = (int)HttpStatusCode.NotFound;
 
 
@@ -296,8 +291,10 @@ namespace MoviesApi.Tests.Controllers
 			// Act
 			var actionResult = await _controller.DeleteAsync(1);
 			var objectResult = actionResult as OkObjectResult;
-			var contentResult = objectResult!.Value as CustomResponse<Genre>;
-			var expectedContentResult = CustomResponse<Genre>.CreateSuccessCustomResponse(200, genre);
+			var contentResult = objectResult!.Value as SuccessResponse<GenreResponseDto>;
+
+			var successFactory = new SuccessResponseFactory<GenreResponseDto>(200, _mapper.Map<GenreResponseDto>(genre));
+			var expectedContentResult = successFactory.Create();
 			var expectedStatusCode = (int)HttpStatusCode.OK;
 
 
