@@ -39,7 +39,7 @@ namespace Movies.Core
 				public virtual ICollection<CharacterInMovie> CharacterActInMovies { get; set; } = new HashSet<CharacterInMovie>();
 
 			 */
-			
+
 
 			CreateMap<Character, CharacterResponseDto>()
 				.ForMember(dest => dest.Id, src => src.MapFrom(src => src.ID)) // Map the Ids
@@ -97,8 +97,58 @@ namespace Movies.Core
 			 */
 
 			CreateMap<CharacterInMovie, CharacterWithMovieResponseDto>()
-				.ForMember(d => d.MovieId , s => s.MapFrom(s => s.MovieID))
-				.ForMember(d => d.CharacterId , s => s.MapFrom(s => s.CharacterID));
+				.ForMember(d => d.MovieId, s => s.MapFrom(s => s.MovieID))
+				.ForMember(d => d.CharacterId, s => s.MapFrom(s => s.CharacterID));
+
+
+
+
+
+			/*
+			 * Movie
+					public int ID { get; set; }
+
+					public string Title { get; set; }
+
+					public int Year { get; set; }
+
+					public double Rate { get; set; }
+
+					public string StoryLine { get; set; }
+
+					public byte[] Poster { get; set; }
+
+					public byte GenreID { get; set; }
+
+					public Genre Genre { get; set; }
+
+			 */
+
+
+			/*
+			 * 
+			 
+			MovieResponseDto
+			  
+					public int ID { get; set; }
+
+					public string Title { get; set; }
+
+					public int Year { get; set; }
+
+					public double Rate { get; set; }
+
+					public string StoryLine { get; set; }
+
+
+					public GenreResponseDto Genre { get; set; }
+			 * 
+			 */
+
+			CreateMap<Movie, MovieResponseDto>()
+			.ForMember(dest => dest.Genre, opt => opt.MapFrom(src => src.Genre));
+
+			CreateMap<Genre, GenreResponseDto>();
 		}
 	}
 }

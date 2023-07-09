@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Movies.Core.DTOs;
 using Movies.Core.Interfaces;
 using System;
 
@@ -155,19 +156,8 @@ namespace MoviesApi.Controllers
 			//	);
 			#endregion
 
-			var moviesDto = ch.CharacterActInMovies.Select(cm => new MovieResponseDto
-			{
-				ID = cm.Movie.ID,
-				Rate = cm.Movie.Rate,
-				StoryLine = cm.Movie.StoryLine,
-				Title = cm.Movie.Title,
-				Year = cm.Movie.Year,
-				Genre = new GenreResponseDto
-				{
-					Id = cm.Movie.Genre.ID,
-					Name = cm.Movie.Genre.Name,
-				}
-			}).ToList();
+			var movies = ch.CharacterActInMovies.Select(cm =>cm.Movie).ToList();
+			var moviesDto = _mapper.Map<List<MovieResponseDto>>(movies);
 			var dto = new CharacterWithAllMoviesResponseDto
 			{
 				Id = ch.ID,
