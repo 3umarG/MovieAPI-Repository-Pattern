@@ -187,7 +187,8 @@ namespace MoviesApi.Controllers
 				_failureFactory = new FailureResponseFactory(404, "There is no Movie with provided Id");
 				return NotFound(_failureFactory.Create());
 			}
-
+			#region Before using AutoMapper
+			/*
 			var charactersDto = movie.CharacterActInMovies.Select(
 					cm => new CharacterResponseDto
 					{
@@ -210,8 +211,12 @@ namespace MoviesApi.Controllers
 				Year = movie.Year,
 				Characters = charactersDto
 			};
+			*/
+			#endregion
 
-			_successFactory = new SuccessResponseFactory<MovieWithAllCharacterResponseDto>(200, movieResultDto);
+			_successFactory = new SuccessResponseFactory<MovieWithAllCharacterResponseDto>(
+				200,
+				_mapper.Map<MovieWithAllCharacterResponseDto>(movie));
 			return Ok(_successFactory.Create());
 		}
 

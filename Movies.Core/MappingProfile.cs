@@ -171,6 +171,35 @@ namespace Movies.Core
 				.ForMember(d => d.LastName, s => s.MapFrom(s => s.CharacterName.LastName))
 				.ForMember(d => d.Movies, s => s.MapFrom(s => s.CharacterActInMovies.Select(cm => cm.Movie)))
 				;
+
+
+
+			/*
+			 *
+			 *    MovieWithAllCharactersResponseDto
+			 *    
+			     
+					public int ID { get; set; }
+
+					public string Title { get; set; }
+
+					public int Year { get; set; }
+
+					public double Rate { get; set; }
+
+					public string StoryLine { get; set; }
+
+
+					public GenreResponseDto Genre { get; set; }
+
+					public List<CharacterResponseDto> Characters { get; set; }
+			 * 
+			 */
+
+			CreateMap<Movie, MovieWithAllCharacterResponseDto>()
+				.ForMember(d  => d.Genre , s => s.MapFrom(s => s.Genre))
+				.ForMember(d => d.Characters , s => s.MapFrom(s => s.CharacterActInMovies.Select(c => c.Character)))
+				;
 		}
 	}
 }
