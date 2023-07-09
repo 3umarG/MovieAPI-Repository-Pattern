@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Movies.Core.Interfaces;
+using Newtonsoft.Json.Linq;
 
 namespace MoviesApi.Controllers
 {
@@ -20,6 +21,7 @@ namespace MoviesApi.Controllers
 			_unitOfWork = unitOfWork;
 		}
 
+		[ProducesResponseType(StatusCodes.Status200OK , Type = typeof(SuccessResponse<List<GenreResponseDto>>))]
 		[HttpGet]
 		public async Task<IActionResult> GetAllAsync()
 		{
@@ -42,6 +44,9 @@ namespace MoviesApi.Controllers
 				return BadRequest();
 			}
 		}
+
+
+
 
 		#region Get All Genres with their Movies End point response error.
 		/*
@@ -72,6 +77,8 @@ namespace MoviesApi.Controllers
 
 
 
+		[ProducesResponseType(StatusCodes.Status201Created, Type = typeof(GenreResponseDto))]
+		[ProducesResponseType(StatusCodes.Status400BadRequest , Type = typeof(FailureResponse))]
 		[HttpPost]
 		public async Task<IActionResult> CreateGenreAsync(GenreRequestDto genre)
 		{
@@ -97,7 +104,7 @@ namespace MoviesApi.Controllers
 				// Only one message
 				//return Content(HttpStatusCode.Created.ToString(), "Created Genre Succfully");
 
-				_successFactory = new SuccessResponseFactory<Genre>(201, g);
+				_successFactory = new SuccessResponseFactory<GenreResponseDto>(201, _mapper.Map<GenreResponseDto>(g));
 				return new ObjectResult(_successFactory.Create())
 				{ StatusCode = StatusCodes.Status201Created };
 
@@ -106,6 +113,9 @@ namespace MoviesApi.Controllers
 			}
 		}
 
+
+		[ProducesResponseType(StatusCodes.Status200OK ,Type = typeof(SuccessResponse<GenreResponseDto>))]
+		[ProducesResponseType(StatusCodes.Status400BadRequest ,Type = typeof(FailureResponse))]
 		[HttpPut("{id}")]
 		public async Task<IActionResult> UpdateAsync(int id, GenreRequestDto dto)
 		{
@@ -131,6 +141,10 @@ namespace MoviesApi.Controllers
 		}
 
 
+
+
+		[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResponse<GenreResponseDto>))]
+		[ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(FailureResponse))]
 		[HttpDelete("{id}")]
 		public async Task<IActionResult> DeleteAsync(int id)
 		{

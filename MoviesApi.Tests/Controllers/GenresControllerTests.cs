@@ -149,9 +149,9 @@ namespace MoviesApi.Tests.Controllers
 			// Act
 			var actionResult = await _controller.CreateGenreAsync(genreDto);
 			var createObjectResult = actionResult as ObjectResult;
-			var objectResultContent = createObjectResult!.Value as SuccessResponse<Genre>;
+			var objectResultContent = createObjectResult!.Value as SuccessResponse<GenreResponseDto>;
 
-			var successFactory = new SuccessResponseFactory<Genre>(201, _mapper.Map<Genre>(genreDto));
+			var successFactory = new SuccessResponseFactory<GenreResponseDto>(201, _mapper.Map<GenreResponseDto>(_mapper.Map<Genre>(genreDto)));
 			var expectedObjectResultContent = successFactory.Create();
 
 			// Assert
