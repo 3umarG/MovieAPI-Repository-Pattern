@@ -1,4 +1,5 @@
-﻿using Movies.Core.Interfaces;
+﻿using AutoMapper;
+using Movies.Core.Interfaces;
 
 namespace MoviesApi.Controllers
 {
@@ -8,12 +9,18 @@ namespace MoviesApi.Controllers
 	{
 		private readonly IUnitOfWork _unitOfWork;
 
-		public GenresController(IUnitOfWork unitOfWork)
+		// will initialized for every action result.
+		private IResponseFactory _successFactory;
+		private IResponseFactory _failureFactory;
+		private readonly IMapper _mapper;
+
+		public GenresController(IUnitOfWork unitOfWork, IMapper mapper)
 		{
+			_mapper = mapper;
 			_unitOfWork = unitOfWork;
 		}
 
-		[HttpGet("AllGenres")]
+		[HttpGet]
 		public async Task<IActionResult> GetAllAsync()
 		{
 			try
@@ -26,7 +33,9 @@ namespace MoviesApi.Controllers
 				//});
 
 				var data = await _unitOfWork.Genres.GetAllAsync();
-				return new OkObjectResult(CustomResponse<List<Genre>>.CreateSuccessCustomResponse(200, data));
+				var dataDto = _mapper.Map<List<GenreResponseDto>>(data);
+				_successFactory = new SuccessResponseFactory<List<GenreResponseDto>>(200, dataDto);
+				return new OkObjectResult(_successFactory.Create());
 			}
 			catch
 			{
@@ -75,10 +84,8 @@ namespace MoviesApi.Controllers
 				//	StatusCode = 404,
 				//	Message = "Genre Name Should be specified !!",
 				//});
-
-				return new BadRequestObjectResult(
-						CustomResponse<object>.CreateFailureCustomResponse((int)HttpStatusCode.BadRequest, new List<string> { "You should provide Name for Genre " })
-					);
+				_failureFactory = new FailureResponseFactory(400, "You should provide Name for Genre");
+				return new BadRequestObjectResult(_failureFactory.Create());
 			}
 			else
 			{
@@ -90,11 +97,8 @@ namespace MoviesApi.Controllers
 				// Only one message
 				//return Content(HttpStatusCode.Created.ToString(), "Created Genre Succfully");
 
-				return new ObjectResult(
-					CustomResponse<Genre>.CreateSuccessCustomResponse(
-						(int)HttpStatusCode.Created,
-						g
-					))
+				_successFactory = new SuccessResponseFactory<Genre>(201, g);
+				return new ObjectResult(_successFactory.Create())
 				{ StatusCode = StatusCodes.Status201Created };
 
 
@@ -107,27 +111,23 @@ namespace MoviesApi.Controllers
 		{
 			if (dto.Name.IsNullOrEmpty())
 			{
-				return new BadRequestObjectResult(
-					CustomResponse<object>
-						.CreateFailureCustomResponse(400, new List<string> { "You should provide Genre name for update" })
-					);
+				_failureFactory = new FailureResponseFactory(400, "You should provide Genre name for update");
+				return new BadRequestObjectResult(_failureFactory.Create());
 			}
 
 			//var genre = await _context.Genres.FirstOrDefaultAsync(g => g.ID == id);
 			var genre = await _unitOfWork.Genres.GetByExpressionAsync(G => G.ID == (byte)id);
 			if (genre is null)
 			{
-				return new NotFoundObjectResult(
-						CustomResponse<object>
-						.CreateFailureCustomResponse(404, new List<string> { "The Genre ID was not found"})
-					);
+				_failureFactory = new FailureResponseFactory(404, "The Genre ID was not found");
+				return new NotFoundObjectResult(_failureFactory.Create());
 			}
 
 			genre.Name = dto.Name!;
 			_unitOfWork.Complete();
 
-
-			return new OkObjectResult(CustomResponse<Genre>.CreateSuccessCustomResponse(200 ,genre));
+			_successFactory = new SuccessResponseFactory<GenreResponseDto>(200, _mapper.Map<GenreResponseDto>(genre));
+			return new OkObjectResult(_successFactory.Create());
 		}
 
 
@@ -138,15 +138,15 @@ namespace MoviesApi.Controllers
 			var genre = await _unitOfWork.Genres.GetByExpressionAsync(G => G.ID == (byte)id);
 			if (genre is null)
 			{
-				return new NotFoundObjectResult(
-					CustomResponse<object>.CreateFailureCustomResponse(404, new List<string> { "There is No Genre with the provided Id"}));
+				_failureFactory = new FailureResponseFactory(404, "There is No Genre with the provided Id");
+				return new NotFoundObjectResult(_failureFactory.Create());
 			}
 
 			_unitOfWork.Genres.Delete(genre);
 			_unitOfWork.Complete();
 
-			return new OkObjectResult(
-				CustomResponse<Genre>.CreateSuccessCustomResponse(200, genre));
+			_successFactory = new SuccessResponseFactory<GenreResponseDto>(200, _mapper.Map<GenreResponseDto>(genre));
+			return new OkObjectResult(_successFactory.Create());
 		}
 	}
 }
