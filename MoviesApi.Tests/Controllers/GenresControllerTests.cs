@@ -7,6 +7,7 @@ using Moq;
 using Movies.Core.DTOs;
 using Movies.Core.Interfaces;
 using Movies.Core.Models;
+using Movies.Core.Models.Responses;
 using MoviesApi.Controllers;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,7 @@ using BadRequestResult = Microsoft.AspNetCore.Mvc.BadRequestResult;
 
 namespace MoviesApi.Tests.Controllers
 {
-	public class GenresControllerTests
+    public class GenresControllerTests
 	{
 		private readonly GenresController _controller;
 		private readonly IUnitOfWork _unitOfWork;

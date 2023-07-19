@@ -3,11 +3,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Movies.Core.DTOs;
 using Movies.Core.Interfaces;
+using Movies.Core.Models.Responses;
 using System;
 
 namespace MoviesApi.Controllers
 {
-	[Route("api/[controller]")]
+    [Route("api/[controller]")]
 	[ApiController]
 	public class CharactersController : ControllerBase
 	{

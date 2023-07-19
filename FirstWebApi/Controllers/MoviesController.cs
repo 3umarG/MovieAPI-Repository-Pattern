@@ -1,11 +1,8 @@
-﻿
-
-using Movies.Core.DTOs;
-using Movies.Core.Interfaces;
+﻿using Movies.Core.Interfaces;
 
 namespace MoviesApi.Controllers
 {
-	[Route("api/[controller]")]
+    [Route("api/[controller]")]
 	[ApiController]
 	public class MoviesController : ControllerBase
 	{

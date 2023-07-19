@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
 using Movies.Core.Interfaces;
+using Movies.Core.Models.Responses;
 using Newtonsoft.Json.Linq;
 
 namespace MoviesApi.Controllers
 {
-	[Route("api/[controller]")]
+    [Route("api/[controller]")]
 	[ApiController]
 	public class GenresController : ControllerBase
 	{
