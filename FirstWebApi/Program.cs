@@ -1,5 +1,6 @@
 
 using Movies.Core.Interfaces;
+using Movies.Core.Models.Responses;
 using Movies.EF;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,6 +34,28 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 /// preferable to add CORS before Autherization
 app.UseCors(c => c.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+
+// Unauthorized (401) & Forbidden (403) MiddleWares
+app.Use(async (context, next) =>
+{
+	await next();
+
+	if (context.Response.StatusCode == (int)HttpStatusCode.Unauthorized) // 401
+	{
+		context.Response.ContentType = "application/json";
+		var unAuthorizedResponse = new UnAuthorizedFailureResponse();
+		await context.Response.WriteAsync(unAuthorizedResponse.ToString());
+	}
+	else if (context.Response.StatusCode == (int)HttpStatusCode.Forbidden) // 403
+	{
+		context.Response.ContentType = "application/json";
+		var forbiddenResponse = new ForbiddenFailureResponse();
+		await context.Response.WriteAsync(forbiddenResponse.ToString());
+	}
+});
+
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
