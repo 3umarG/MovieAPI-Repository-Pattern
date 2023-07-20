@@ -1,6 +1,7 @@
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.OpenApi.Models;
 using Movies.Core.Interfaces;
 using Movies.Core.Models.Auth;
 using Movies.Core.Models.Responses;
@@ -16,7 +17,59 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// Configure Swagger 
+builder.Services.AddSwaggerGen(options =>
+{
+	// Change the main schema for the Swagger
+	options.SwaggerDoc("v1", new OpenApiInfo
+	{
+		Version = "v1",
+		Title = "AuthWebApi",
+		Description = "Demo Web Api for using Identity Framework with JWT using Access Tokens and Refresh Tokens .",
+		TermsOfService = new Uri("https://www.google.com"),
+		Contact = new OpenApiContact
+		{
+			Name = "OmarGomaa",
+			Email = "omargomaa.dev@gmail.com",
+			Url = new Uri("https://www.google.com")
+		},
+		License = new OpenApiLicense
+		{
+			Name = "My license",
+			Url = new Uri("https://www.google.com")
+		}
+	});
+
+	// Add Global Authorization for all controllers with their end point
+	options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+	{
+		Name = "Authorization",
+		Type = SecuritySchemeType.ApiKey,
+		Scheme = "Bearer",
+		BearerFormat = "JWT",
+		In = ParameterLocation.Header,
+		Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 12345abcdef\""
+	});
+
+	// Add Specific Authorization option for every end point
+	options.AddSecurityRequirement(new OpenApiSecurityRequirement
+	{
+		{
+			new OpenApiSecurityScheme
+			{
+				Reference = new OpenApiReference
+				{
+					Type = ReferenceType.SecurityScheme,
+					Id = "Bearer"
+				},
+				Name = "Bearer",
+				In = ParameterLocation.Header
+			},
+			new List<string>()
+		}
+	});
+});
+
 builder.Services.AddCors();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
