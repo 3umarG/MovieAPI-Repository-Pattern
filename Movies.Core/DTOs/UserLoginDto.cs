@@ -10,6 +10,7 @@ namespace Movies.Core.DTOs
 	public class UserLoginDto
 	{
         [Required]
+        [DataType(DataType.EmailAddress)]
         public string EmailOrUserName { get; set; }
 
         [Required]

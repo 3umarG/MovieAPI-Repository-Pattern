@@ -40,12 +40,11 @@ namespace Movies.EF.Services
 		{
 			var auth = new AuthModel();
 
-
-			var user = await _userManager.FindByNameAsync(dto.EmailOrUserName);
+			var user = await _userManager.FindByEmailAsync(dto.EmailOrUserName);
 
 			if (user is null || !await _userManager.CheckPasswordAsync(user, dto.Password))
 			{
-				auth.Message = "Not valid Email or Password !!";
+				auth.Message = "Your Email or Password is not correct";
 				return auth;
 			}
 
@@ -162,6 +161,9 @@ namespace Movies.EF.Services
 		{
 			var jwtToken = await CreateJwtToken(appUser);
 			var refreshToken = GenerateRefreshToken();
+
+			appUser.RefreshTokens.Add(refreshToken);
+			await _userManager.UpdateAsync(appUser);
 
 			authModel.IsAuthed = true;
 			authModel.Email = appUser.Email;

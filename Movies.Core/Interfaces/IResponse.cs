@@ -4,7 +4,7 @@
 	{
 		public int StatusCode { get; }
 
-		public string? Message { get; }
+		public string? Message { get; set; }
 
 		public bool Status { get; }
 	}
