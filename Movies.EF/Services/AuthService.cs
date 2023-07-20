@@ -62,7 +62,7 @@ namespace Movies.EF.Services
 			}
 
 			var appUser = _mapper.Map<ApplicationUser>(dto);
-			var result = await _userManager.CreateAsync(appUser);
+			var result = await _userManager.CreateAsync(appUser , dto.Password);
 
 			if (!result.Succeeded)
 			{
