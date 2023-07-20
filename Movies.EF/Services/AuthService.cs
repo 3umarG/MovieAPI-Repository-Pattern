@@ -128,12 +128,7 @@ namespace Movies.EF.Services
 			return auth;
 		}
 
-		public Task<AuthModel> RegisterAsAdmin(UserRegisterDto dto)
-		{
-			throw new NotImplementedException();
-		}
-
-		public async Task<AuthModel> RegisterAsync(UserRegisterDto dto)
+		public async Task<AuthModel> RegisterAsync(UserRegisterDto dto, string? role = "user")
 		{
 			var authModel = new AuthModel();
 			var user = await _userManager.FindByEmailAsync(dto.EmailOrUserName);
@@ -156,6 +151,7 @@ namespace Movies.EF.Services
 				return authModel;
 			}
 
+			await _userManager.AddToRoleAsync(appUser ,role);
 			await InitializeSuccessAuthModel(authModel, appUser);
 
 			return authModel;

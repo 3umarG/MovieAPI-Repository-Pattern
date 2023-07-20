@@ -8,16 +8,15 @@ using System.Threading.Tasks;
 
 namespace Movies.Core.Interfaces
 {
-    public interface IAuthService
-    {
-        public Task<AuthModel> RegisterAsync(UserRegisterDto dto);
+	public interface IAuthService
+	{
+		public Task<AuthModel> RegisterAsync(UserRegisterDto dto , string? role = "user");
 
-        public Task<AuthModel> RegisterAsAdmin(UserRegisterDto dto);
 
-        public Task<AuthModel> LoginAsync(UserLoginDto dto);
+		public Task<AuthModel> LoginAsync(UserLoginDto dto);
 
-        public Task<AuthModel> RefreshTokenAsync(string oldRefreshToken);
+		public Task<AuthModel> RefreshTokenAsync(string oldRefreshToken);
 
-        public Task<bool> RevokeTokenAsync(string token);
-    }
+		public Task<bool> RevokeTokenAsync(string token);
+	}
 }
