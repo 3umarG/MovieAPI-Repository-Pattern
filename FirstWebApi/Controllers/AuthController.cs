@@ -66,7 +66,7 @@ namespace MoviesApi.Controllers
 		{
 			var token = Request.Cookies["refreshToken"];
 
-			if(token is null)
+			if (token is null)
 			{
 				_failureFactory = new FailureResponseFactory(400, "You should provide refreshToken !!");
 				return BadRequest(_failureFactory.CreateResponse());
@@ -76,12 +76,34 @@ namespace MoviesApi.Controllers
 
 			if (!result.IsAuthed)
 			{
-				return Unauthorized(_unAuthorizedFactory.CreateResponse());
+				var response = _unAuthorizedFactory.CreateResponse();
+				response.Message = result.Message;
+				return Unauthorized(response);
 			}
 
 			SetRefreshTokenToCookies(result.RefreshToken, result.RefreshTokenExpiration);
-			_successFactory = new SuccessResponseFactory<AuthModel>(200 , result);
+			_successFactory = new SuccessResponseFactory<AuthModel>(200, result);
 			return Ok(_successFactory.CreateResponse());
+		}
+
+
+		[HttpGet("revoke-token")]
+		public async Task<IActionResult> RevokeTokenAsync()
+		{
+			var token = Request.Cookies["refreshToken"];
+
+			if (token is null)
+			{
+				return Unauthorized(_unAuthorizedFactory.CreateResponse());
+			}
+
+			if (!await _authService.RevokeTokenAsync(token))
+			{
+				_failureFactory = new FailureResponseFactory(400, "Something went wrong when revoking the token");
+				return BadRequest(_failureFactory.CreateResponse());
+			}
+
+			return NoContent();
 		}
 
 
