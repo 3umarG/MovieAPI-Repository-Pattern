@@ -1,5 +1,6 @@
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Movies.Core.Interfaces;
 using Movies.Core.Models.Auth;
 using Movies.Core.Models.Responses;
@@ -25,6 +26,17 @@ builder.Services.AddDbContext<ApplicationDbContext>(
 	));
 
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
+
+
+/// For Idetity Setup 
+builder.Services.AddAuthentication();
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+	options.User.RequireUniqueEmail = false;
+})
+	   .AddEntityFrameworkStores<ApplicationDbContext>()
+	   .AddDefaultTokenProviders();
+
 
 // Add our AuthService 
 builder.Services.AddScoped<IAuthService, AuthService>();
