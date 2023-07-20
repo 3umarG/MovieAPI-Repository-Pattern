@@ -38,8 +38,20 @@ namespace MoviesApi.Controllers
 				return BadRequest(_failureFactory.CreateResponse());
 			}
 
+			SetRefreshTokenToCookies(result.RefreshToken!, result.RefreshTokenExpiration);
 			_successFactory = new SuccessResponseFactory<AuthModel>(200, result);
 			return Ok(_successFactory.CreateResponse());
+		}
+
+		private void SetRefreshTokenToCookies(string refreshToken, DateTime expiresOn)
+		{
+			var cookieOptions = new CookieOptions
+			{
+				HttpOnly = true,
+				Expires = expiresOn
+			};
+
+			Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
 		}
 	}
 }
