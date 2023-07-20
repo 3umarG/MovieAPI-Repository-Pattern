@@ -163,6 +163,9 @@ namespace Movies.EF.Services
 			var jwtToken = await CreateJwtToken(appUser);
 			var refreshToken = GenerateRefreshToken();
 
+			appUser.RefreshTokens.Add(refreshToken);
+			await _userManager.UpdateAsync(appUser);
+
 			authModel.IsAuthed = true;
 			authModel.Email = appUser.Email;
 			authModel.UserName = appUser.UserName;
