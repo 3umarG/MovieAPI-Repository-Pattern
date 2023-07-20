@@ -12,9 +12,9 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddControllers();
+
+//var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 // Configure Swagger 
@@ -90,10 +90,6 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 	   .AddEntityFrameworkStores<ApplicationDbContext>()
 	   .AddDefaultTokenProviders();
 
-
-// Add our AuthService 
-builder.Services.AddScoped<IAuthService, AuthService>();
-
 // Mapping JWT values from appsettings.json to object
 builder.Services.Configure<JWT>(builder.Configuration.GetSection("JWT"));
 
@@ -120,7 +116,9 @@ builder.Services.AddAuthentication(options =>
 					};
 				});
 
-
+// Add our AuthService 
+//builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddTransient<IAuthService, AuthService>();
 
 var app = builder.Build();
 
