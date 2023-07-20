@@ -34,9 +34,44 @@ namespace Movies.EF.Services
 			_roleManager = roleManager;
 		}
 
-		public Task<AuthModel> LoginAsync(UserLoginDto dto)
+		public async Task<AuthModel> LoginAsync(UserLoginDto dto)
 		{
-			throw new NotImplementedException();
+			var auth = new AuthModel();
+
+
+			var user = await _userManager.FindByNameAsync(dto.EmailOrUserName);
+
+			if (user is null || !await _userManager.CheckPasswordAsync(user, dto.Password))
+			{
+				auth.Message = "Not valid Email or Password !!";
+				return auth;
+			}
+
+			auth.UserName = user.UserName;
+			auth.Email = user.Email;
+			auth.IsAuthed = true;
+
+			var jwtToken = await CreateJwtToken(user);
+			auth.Token = new JwtSecurityTokenHandler().WriteToken(jwtToken);
+			auth.AccessTokenExpiration = jwtToken.ValidTo;
+
+
+
+			var refreshToken = user.RefreshTokens.FirstOrDefault(t => t.IsActive);
+
+			if(refreshToken is null)
+			{
+				refreshToken = GenerateRefreshToken();
+				user.RefreshTokens.Add(refreshToken);
+				await _userManager.UpdateAsync(user);
+			}
+
+
+			auth.RefreshToken = refreshToken.Token;
+			auth.RefreshTokenExpiration = refreshToken.ExpiresOn;
+
+
+			return auth;
 		}
 
 		public Task<AuthModel> RefreshTokenAsync(string oldRefreshToken)
@@ -62,7 +97,9 @@ namespace Movies.EF.Services
 			}
 
 			var appUser = _mapper.Map<ApplicationUser>(dto);
-			var result = await _userManager.CreateAsync(appUser , dto.Password);
+			appUser.Email = dto.EmailOrUserName;
+
+			var result = await _userManager.CreateAsync(appUser, dto.Password);
 
 			if (!result.Succeeded)
 			{
