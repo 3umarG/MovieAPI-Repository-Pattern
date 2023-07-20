@@ -13,7 +13,7 @@ namespace Movies.Core.Models.Responses
 
         public int StatusCode { get; private set; }
 
-        public string? Message { get; private set; }
+        public string? Message { get; set; }
 
         public FailureResponse(int statusCode, string? message = null)
         {
