@@ -43,6 +43,24 @@ namespace MoviesApi.Controllers
 			return Ok(_successFactory.CreateResponse());
 		}
 
+
+		[HttpPost("login")]
+		public async Task<IActionResult> LoginAsync(UserLoginDto dto)
+		{
+			var result = await _authService.LoginAsync(dto);
+
+			if (!result.IsAuthed)
+			{
+				_failureFactory = new FailureResponseFactory((int)HttpStatusCode.Unauthorized, result.Message);
+				return Unauthorized(_failureFactory.CreateResponse());
+			}
+
+			SetRefreshTokenToCookies(result.RefreshToken , result.RefreshTokenExpiration);
+			_successFactory = new SuccessResponseFactory<AuthModel>(200, result);
+			return Ok(_successFactory.CreateResponse());
+		}
+
+
 		private void SetRefreshTokenToCookies(string refreshToken, DateTime expiresOn)
 		{
 			var cookieOptions = new CookieOptions
