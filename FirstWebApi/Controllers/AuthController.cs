@@ -55,8 +55,32 @@ namespace MoviesApi.Controllers
 				return Unauthorized(_failureFactory.CreateResponse());
 			}
 
-			SetRefreshTokenToCookies(result.RefreshToken , result.RefreshTokenExpiration);
+			SetRefreshTokenToCookies(result.RefreshToken, result.RefreshTokenExpiration);
 			_successFactory = new SuccessResponseFactory<AuthModel>(200, result);
+			return Ok(_successFactory.CreateResponse());
+		}
+
+
+		[HttpGet("refresh-token")]
+		public async Task<IActionResult> RefreshTokenAsync()
+		{
+			var token = Request.Cookies["refreshToken"];
+
+			if(token is null)
+			{
+				_failureFactory = new FailureResponseFactory(400, "You should provide refreshToken !!");
+				return BadRequest(_failureFactory.CreateResponse());
+			}
+
+			var result = await _authService.RefreshTokenAsync(token);
+
+			if (!result.IsAuthed)
+			{
+				return Unauthorized(_unAuthorizedFactory.CreateResponse());
+			}
+
+			SetRefreshTokenToCookies(result.RefreshToken, result.RefreshTokenExpiration);
+			_successFactory = new SuccessResponseFactory<AuthModel>(200 , result);
 			return Ok(_successFactory.CreateResponse());
 		}
 
