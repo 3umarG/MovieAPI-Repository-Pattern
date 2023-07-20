@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Movies.Core.DTOs;
 using Movies.Core.Models;
+using Movies.Core.Models.Auth;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -149,6 +150,12 @@ namespace Movies.Core
 			.ForMember(dest => dest.Genre, opt => opt.MapFrom(src => src.Genre));
 
 			CreateMap<Genre, GenreResponseDto>();
+
+			CreateMap<ApplicationUser, UserRegisterDto>()
+				.IgnoreAllPropertiesWithAnInaccessibleSetter()
+				.IgnoreAllSourcePropertiesWithAnInaccessibleSetter()
+				.ForMember(d => d.EmailOrUserName , s => s.MapFrom(s => s.UserName))
+				.ReverseMap();
 
 
 			/*

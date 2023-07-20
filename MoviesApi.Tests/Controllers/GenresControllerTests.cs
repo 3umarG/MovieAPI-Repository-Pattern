@@ -7,6 +7,7 @@ using Moq;
 using Movies.Core.DTOs;
 using Movies.Core.Interfaces;
 using Movies.Core.Models;
+using Movies.Core.Models.Factories;
 using Movies.Core.Models.Responses;
 using MoviesApi.Controllers;
 using System;
