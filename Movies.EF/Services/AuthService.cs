@@ -151,7 +151,7 @@ namespace Movies.EF.Services
 				return authModel;
 			}
 
-			await _userManager.AddToRoleAsync(appUser ,role);
+			await _userManager.AddToRoleAsync(appUser, role);
 			await InitializeSuccessAuthModel(authModel, appUser);
 
 			return authModel;
@@ -243,6 +243,32 @@ namespace Movies.EF.Services
 				ExpiresOn = DateTime.UtcNow.AddDays(10),
 				CreatedOn = DateTime.UtcNow
 			};
+		}
+
+		public async Task<string> AddUserToRoleAsync(AddUserToRoleRequestDto dto)
+		{
+			// check for the existing user ...
+			var user = await _userManager.FindByNameAsync(dto.EmailOrUserName);
+
+			if (user is null)
+				return $"There is no user called : {dto.EmailOrUserName}";
+
+			// check for the role name ...
+			var isValidRoleName = await _roleManager.RoleExistsAsync(dto.RoleName);
+
+			if (!isValidRoleName)
+				return $"There is no existing role called : {dto.RoleName}";
+
+			// check for is that user already has this role or not ..
+			if (await _userManager.IsInRoleAsync(user, dto.RoleName))
+				return $"User : {dto.EmailOrUserName} is already assigned to {dto.RoleName} Role .";
+
+			var result = await _userManager.AddToRoleAsync(user, dto.RoleName);
+
+			if (!result.Succeeded)
+				return "Something wen wrong";
+
+			return string.Empty;
 		}
 	}
 }

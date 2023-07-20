@@ -18,5 +18,7 @@ namespace Movies.Core.Interfaces
 		public Task<AuthModel> RefreshTokenAsync(string oldRefreshToken);
 
 		public Task<bool> RevokeTokenAsync(string token);
+
+		public Task<string> AddUserToRoleAsync(AddUserToRoleRequestDto dto);
 	}
 }
