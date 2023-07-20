@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Movies.Core.Interfaces;
+using Movies.Core.Models.Factories;
 using Movies.Core.Models.Responses;
 using Newtonsoft.Json.Linq;
 
