@@ -4,6 +4,7 @@ using Movies.Core.Interfaces;
 using Movies.Core.Models.Auth;
 using Movies.Core.Models.Responses;
 using Movies.EF;
+using Movies.EF.Services;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,6 +26,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(
 
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 
+// Add our AuthService 
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Mapping JWT values from appsettings.json to object
 builder.Services.Configure<JWT>(builder.Configuration.GetSection("JWT"));
