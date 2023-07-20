@@ -1,0 +1,36 @@
+﻿using Movies.Core.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
+
+namespace Movies.Core.Models.Responses
+{
+	public class UnAuthorizedFailureResponse : IResponse
+    {
+        public int StatusCode { get; private set; }
+
+        public string? Message { get; private set; }
+
+        public bool Status { get; private set; }
+
+
+        public UnAuthorizedFailureResponse()
+        {
+            Status = false;
+            StatusCode = 401;
+            Message = "You are UnAuthorized , please provide correct token to your headers";
+        }
+
+        public override string ToString()
+        {
+            var options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+            return JsonSerializer.Serialize(this, options);
+        }
+    }
+}

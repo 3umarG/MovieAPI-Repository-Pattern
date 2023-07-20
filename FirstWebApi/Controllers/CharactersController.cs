@@ -30,7 +30,7 @@ namespace MoviesApi.Controllers
 		{
 			var characters = await _unitOfWork.Characters.GetAllAsync();
 			_successFactory = new SuccessResponseFactory<List<CharacterResponseDto>>(200, _mapper.Map<List<CharacterResponseDto>>(characters));
-			return Ok(_successFactory.Create());
+			return Ok(_successFactory.CreateResponse());
 		}
 
 
@@ -52,7 +52,7 @@ namespace MoviesApi.Controllers
 						200,
 						_mapper.Map<CharacterResponseDto>(ch)
 				);
-				return Ok(_successFactory.Create());
+				return Ok(_successFactory.CreateResponse());
 			}
 			return BadRequest();
 		}
@@ -67,7 +67,7 @@ namespace MoviesApi.Controllers
 			if (ch is null)
 			{
 				_failureFactory = new FailureResponseFactory(404, "Not Found Character with the provided ID");
-				return NotFound(_failureFactory.Create());
+				return NotFound(_failureFactory.CreateResponse());
 			}
 
 			// Before use AutoMapper :
@@ -84,7 +84,7 @@ namespace MoviesApi.Controllers
 				ch.BirthDate = dto.BirthDate.Value;
 
 			// with using AutoMapper :
-			// BUG : with using this approach , you create new instance and instead of updating it , you will insert new one. 
+			// BUG : with using this approach , you CreateResponse new instance and instead of updating it , you will insert new one. 
 			//ch = _mapper.Map<Character>(dto);
 
 			var updatedCh = _unitOfWork.Characters.Update(ch);
@@ -95,7 +95,7 @@ namespace MoviesApi.Controllers
 
 			_successFactory = new SuccessResponseFactory<CharacterResponseDto>(200, _mapper.Map<CharacterResponseDto>(ch));
 
-			return Ok(_successFactory.Create());
+			return Ok(_successFactory.CreateResponse());
 		}
 
 
@@ -108,12 +108,12 @@ namespace MoviesApi.Controllers
 			if (ch is null)
 			{
 				_failureFactory = new FailureResponseFactory(404, "Not found Character with the provided id");
-				return NotFound(_failureFactory.Create());
+				return NotFound(_failureFactory.CreateResponse());
 
 			}
 			_unitOfWork.Characters.Delete(ch);
 			_successFactory = new SuccessResponseFactory<CharacterResponseDto>(200, _mapper.Map<CharacterResponseDto>(ch));
-			return Ok(_successFactory.Create());
+			return Ok(_successFactory.CreateResponse());
 		}
 
 
@@ -128,13 +128,13 @@ namespace MoviesApi.Controllers
 			if (result is null)
 			{
 				_failureFactory = new FailureResponseFactory(400, "Make sure of the MovieId and CharacterId are exist");
-				return BadRequest(_failureFactory.Create());
+				return BadRequest(_failureFactory.CreateResponse());
 			}
 
 			var responseDto = _mapper.Map<CharacterWithMovieResponseDto>(result);
 
 			_successFactory = new SuccessResponseFactory<CharacterWithMovieResponseDto>(200, responseDto);
-			return Ok(_successFactory.Create());
+			return Ok(_successFactory.CreateResponse());
 		}
 
 
@@ -149,7 +149,7 @@ namespace MoviesApi.Controllers
 			if (ch is null)
 			{
 				_failureFactory = new FailureResponseFactory(404, "There is no Character with provided Id");
-				return NotFound(_failureFactory.Create());
+				return NotFound(_failureFactory.CreateResponse());
 			}
 
 			#region Return only movies without character data
@@ -189,7 +189,7 @@ namespace MoviesApi.Controllers
 						200,
 						_mapper.Map<CharacterWithAllMoviesResponseDto>(ch)
 			);
-			return Ok(_successFactory.Create());
+			return Ok(_successFactory.CreateResponse());
 		}
 
 
@@ -204,7 +204,7 @@ namespace MoviesApi.Controllers
 			if (movie is null)
 			{
 				_failureFactory = new FailureResponseFactory(404, "There is no Movie with provided Id");
-				return NotFound(_failureFactory.Create());
+				return NotFound(_failureFactory.CreateResponse());
 			}
 			#region Before using AutoMapper
 			/*
@@ -236,7 +236,7 @@ namespace MoviesApi.Controllers
 			_successFactory = new SuccessResponseFactory<MovieWithAllCharacterResponseDto>(
 				200,
 				_mapper.Map<MovieWithAllCharacterResponseDto>(movie));
-			return Ok(_successFactory.Create());
+			return Ok(_successFactory.CreateResponse());
 		}
 
 
@@ -254,17 +254,17 @@ namespace MoviesApi.Controllers
 				if (character is null)
 				{
 					_failureFactory = new FailureResponseFactory(404, "Failed");
-					return NotFound(_failureFactory.Create());
+					return NotFound(_failureFactory.CreateResponse());
 				}
 
 				_successFactory = new SuccessResponseFactory<CharacterWithMovieResponseDto>
 					(200, _mapper.Map<CharacterWithMovieResponseDto>(character));
-				return Ok(_successFactory.Create());
+				return Ok(_successFactory.CreateResponse());
 			}
 			catch (Exception ex)
 			{
 				_failureFactory = new FailureResponseFactory(400, ex.Message);
-				return BadRequest(_failureFactory.Create());
+				return BadRequest(_failureFactory.CreateResponse());
 			}
 
 

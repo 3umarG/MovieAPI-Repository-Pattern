@@ -19,7 +19,7 @@ namespace Movies.Core.Models.Factories
             StatusCode = statusCode;
             Message = message;
         }
-        public IResponse Create()
+        public IResponse CreateResponse()
         {
             return new FailureResponse(StatusCode, Message);
         }

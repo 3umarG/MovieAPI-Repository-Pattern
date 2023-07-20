@@ -59,7 +59,7 @@ namespace MoviesApi.Tests.Controllers
 			var okObjectResultValue = okObjectResult!.Value as SuccessResponse<List<GenreResponseDto>>;
 
 			var successFactory = new SuccessResponseFactory<List<GenreResponseDto>>(200, _mapper.Map<List<GenreResponseDto>>(genres));
-			var expectedResult = successFactory.Create();
+			var expectedResult = successFactory.CreateResponse();
 
 
 			// Assert : compare the accepted result with the expected.
@@ -85,7 +85,7 @@ namespace MoviesApi.Tests.Controllers
 			var okObjectResultValue = okObjectResult!.Value as SuccessResponse<List<GenreResponseDto>>;
 
 			var successFactory = new SuccessResponseFactory<List<GenreResponseDto>>(200 , _mapper.Map<List<GenreResponseDto>>(new() { }));
-			var expectedResult = successFactory.Create();
+			var expectedResult = successFactory.CreateResponse();
 
 			// Assert : compare the accepted result with the expected.
 			Assert.NotNull(actionResult);
@@ -129,7 +129,7 @@ namespace MoviesApi.Tests.Controllers
 			var badRequestValue = badRequestObjectResult!.Value as IResponse;
 
 			var failureFactory = new FailureResponseFactory(400, "You should provide Name for Genre");
-			var actualBadRequestResult = failureFactory.Create();
+			var actualBadRequestResult = failureFactory.CreateResponse();
 
 
 			// Assert
@@ -154,7 +154,7 @@ namespace MoviesApi.Tests.Controllers
 			var objectResultContent = createObjectResult!.Value as SuccessResponse<GenreResponseDto>;
 
 			var successFactory = new SuccessResponseFactory<GenreResponseDto>(201, _mapper.Map<GenreResponseDto>(_mapper.Map<Genre>(genreDto)));
-			var expectedObjectResultContent = successFactory.Create();
+			var expectedObjectResultContent = successFactory.CreateResponse();
 
 			// Assert
 			actionResult.Should().NotBeNull();
@@ -181,7 +181,7 @@ namespace MoviesApi.Tests.Controllers
 			var badRequestValue = badRequestObjectResult!.Value as IResponse;
 
 			var failureFactory = new FailureResponseFactory(400, "You should provide Genre name for update");
-			var actualBadRequestResult = failureFactory.Create();
+			var actualBadRequestResult = failureFactory.CreateResponse();
 
 
 			// Assert
@@ -207,7 +207,7 @@ namespace MoviesApi.Tests.Controllers
 			var objectResultContent = objectResult!.Value as IResponse;
 
 			var failureFact = new FailureResponseFactory(404, "The Genre ID was not found");
-			var actualObjectResultContent = failureFact.Create();
+			var actualObjectResultContent = failureFact.CreateResponse();
 
 
 
@@ -240,7 +240,7 @@ namespace MoviesApi.Tests.Controllers
 			var contentObjectResult = objectResult!.Value as SuccessResponse<GenreResponseDto>;
 
 			var successFactory = new SuccessResponseFactory<GenreResponseDto>(200, _mapper.Map<GenreResponseDto>(genre)); 
-			var actualContent = successFactory.Create();
+			var actualContent = successFactory.CreateResponse();
 
 			// Assert
 			actionResult.Should().NotBeNull();
@@ -266,7 +266,7 @@ namespace MoviesApi.Tests.Controllers
 			var contentResult = objectResult!.Value as IResponse;
 
 			var failureFactory = new FailureResponseFactory(404, "There is No Genre with the provided Id");
-			var expectedContentResult = failureFactory.Create();
+			var expectedContentResult = failureFactory.CreateResponse();
 			var expectedStatusCode = (int)HttpStatusCode.NotFound;
 
 
@@ -296,7 +296,7 @@ namespace MoviesApi.Tests.Controllers
 			var contentResult = objectResult!.Value as SuccessResponse<GenreResponseDto>;
 
 			var successFactory = new SuccessResponseFactory<GenreResponseDto>(200, _mapper.Map<GenreResponseDto>(genre));
-			var expectedContentResult = successFactory.Create();
+			var expectedContentResult = successFactory.CreateResponse();
 			var expectedStatusCode = (int)HttpStatusCode.OK;
 
 

@@ -39,7 +39,7 @@ namespace MoviesApi.Controllers
 				var data = await _unitOfWork.Genres.GetAllAsync();
 				var dataDto = _mapper.Map<List<GenreResponseDto>>(data);
 				_successFactory = new SuccessResponseFactory<List<GenreResponseDto>>(200, dataDto);
-				return new OkObjectResult(_successFactory.Create());
+				return new OkObjectResult(_successFactory.CreateResponse());
 			}
 			catch
 			{
@@ -66,7 +66,7 @@ namespace MoviesApi.Controllers
 
 				var data = _unitOfWork.Genres.QueryableOf().Include(G => G.Movies).ToList();
 
-                //var response = CustomResponse<List<Genre>>.CreateSuccessCustomResponse(200, data);
+                //var response = CustomResponse<List<Genre>>.CreateResponseSuccessCustomResponse(200, data);
 				return  Ok(data);
 			}
 			catch
@@ -94,7 +94,7 @@ namespace MoviesApi.Controllers
 				//	Message = "Genre Name Should be specified !!",
 				//});
 				_failureFactory = new FailureResponseFactory(400, "You should provide Name for Genre");
-				return new BadRequestObjectResult(_failureFactory.Create());
+				return new BadRequestObjectResult(_failureFactory.CreateResponse());
 			}
 			else
 			{
@@ -104,10 +104,10 @@ namespace MoviesApi.Controllers
 				_unitOfWork.Complete();
 
 				// Only one message
-				//return Content(HttpStatusCode.Created.ToString(), "Created Genre Succfully");
+				//return Content(HttpStatusCode.CreateResponsed.ToString(), "CreateResponsed Genre Succfully");
 
 				_successFactory = new SuccessResponseFactory<GenreResponseDto>(201, _mapper.Map<GenreResponseDto>(g));
-				return new ObjectResult(_successFactory.Create())
+				return new ObjectResult(_successFactory.CreateResponse())
 				{ StatusCode = StatusCodes.Status201Created };
 
 
@@ -124,7 +124,7 @@ namespace MoviesApi.Controllers
 			if (dto.Name.IsNullOrEmpty())
 			{
 				_failureFactory = new FailureResponseFactory(400, "You should provide Genre name for update");
-				return new BadRequestObjectResult(_failureFactory.Create());
+				return new BadRequestObjectResult(_failureFactory.CreateResponse());
 			}
 
 			//var genre = await _context.Genres.FirstOrDefaultAsync(g => g.ID == id);
@@ -132,14 +132,14 @@ namespace MoviesApi.Controllers
 			if (genre is null)
 			{
 				_failureFactory = new FailureResponseFactory(404, "The Genre ID was not found");
-				return new NotFoundObjectResult(_failureFactory.Create());
+				return new NotFoundObjectResult(_failureFactory.CreateResponse());
 			}
 
 			genre.Name = dto.Name!;
 			_unitOfWork.Complete();
 
 			_successFactory = new SuccessResponseFactory<GenreResponseDto>(200, _mapper.Map<GenreResponseDto>(genre));
-			return new OkObjectResult(_successFactory.Create());
+			return new OkObjectResult(_successFactory.CreateResponse());
 		}
 
 
@@ -155,14 +155,14 @@ namespace MoviesApi.Controllers
 			if (genre is null)
 			{
 				_failureFactory = new FailureResponseFactory(404, "There is No Genre with the provided Id");
-				return new NotFoundObjectResult(_failureFactory.Create());
+				return new NotFoundObjectResult(_failureFactory.CreateResponse());
 			}
 
 			_unitOfWork.Genres.Delete(genre);
 			_unitOfWork.Complete();
 
 			_successFactory = new SuccessResponseFactory<GenreResponseDto>(200, _mapper.Map<GenreResponseDto>(genre));
-			return new OkObjectResult(_successFactory.Create());
+			return new OkObjectResult(_successFactory.CreateResponse());
 		}
 	}
 }

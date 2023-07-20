@@ -25,7 +25,7 @@ namespace Movies.Core.Models.Factories
         public string? Message { get; private set; }
 
 
-        public IResponse Create()
+        public IResponse CreateResponse()
         {
             return new SuccessResponse<T>(StatusCode, Data, Message);
         }
