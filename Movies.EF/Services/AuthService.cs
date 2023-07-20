@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Movies.Core.DTOs;
 using Movies.Core.Interfaces;
@@ -59,7 +60,7 @@ namespace Movies.EF.Services
 
 			var refreshToken = user.RefreshTokens.FirstOrDefault(t => t.IsActive);
 
-			if(refreshToken is null)
+			if (refreshToken is null)
 			{
 				refreshToken = GenerateRefreshToken();
 				user.RefreshTokens.Add(refreshToken);
@@ -74,9 +75,57 @@ namespace Movies.EF.Services
 			return auth;
 		}
 
-		public Task<AuthModel> RefreshTokenAsync(string oldRefreshToken)
+		public async Task<AuthModel> RefreshTokenAsync(string oldToken)
 		{
-			throw new NotImplementedException();
+			var auth = new AuthModel();
+
+			var user = await _userManager
+								.Users
+								.FirstOrDefaultAsync(u =>	
+									u.RefreshTokens	
+									.Any(t => t.Token == oldToken)
+								);
+
+			if(user is null)
+			{
+				auth.Message = "Invalid Refresh Token";
+				return auth;
+			}
+
+			var refreshToken =  user.RefreshTokens.Single(t => t.Token == oldToken);
+			
+			if (!refreshToken.IsActive)
+			{
+				auth.Message = "Inactive Refresh Token";
+				return auth;
+			}
+
+			// Active Refresh Token :
+
+			// Revoke old one ...
+			refreshToken.RevokedOn = DateTime.UtcNow;
+
+			// create new refresh token
+			var newRefreshToken = GenerateRefreshToken();
+			user.RefreshTokens.Add(newRefreshToken);
+
+			// update user
+			await _userManager.UpdateAsync(user);
+
+			// create new JWT Token 
+			var newJwtToken = await CreateJwtToken(user);
+
+			auth.Email = user.Email;
+			auth.UserName = user.UserName;
+			auth.IsAuthed = true;
+			auth.RefreshToken = newRefreshToken.Token;
+			auth.RefreshTokenExpiration = newRefreshToken.ExpiresOn;
+			auth.Token = new JwtSecurityTokenHandler().WriteToken(newJwtToken);
+			auth.AccessTokenExpiration = newJwtToken.ValidTo;
+
+
+
+			return auth;
 		}
 
 		public Task<AuthModel> RegisterAsAdmin(UserRegisterDto dto)
