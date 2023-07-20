@@ -11,10 +11,12 @@ namespace FirstWebApi.Models
 {
 	public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 	{
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) 
-        {
-            
-        }
+		private static readonly String UserRoleKey = Guid.NewGuid().ToString();
+		private static readonly String AdminRoleKey = Guid.NewGuid().ToString();
+		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+		{
+
+		}
 
 		public ApplicationDbContext() { }
 
@@ -40,17 +42,33 @@ namespace FirstWebApi.Models
 					t.Property<int>("Id");
 					t.HasKey("Id");
 				});
-			
+
 
 			modelBuilder.ApplyConfiguration(new GenreConfig());
 			modelBuilder.ApplyConfiguration(new MovieConfig());
 			modelBuilder.ApplyConfiguration(new CharcaterConfig());
 			modelBuilder.ApplyConfiguration(new CharactersInMoviesConfig());
+
+			
+			modelBuilder.Entity<IdentityRole>().HasData(
+					new IdentityRole
+					{
+						Id = UserRoleKey,
+						Name = "user",
+						NormalizedName = "user".ToUpper()
+					},
+					new IdentityRole
+					{
+						Id = AdminRoleKey,
+						Name = "admin",
+						NormalizedName = "admin".ToUpper()
+					}
+				);
 		}
 
-		public virtual DbSet<Genre> Genres { get;set; }
-		public virtual DbSet<Movie> Movies { get;set; }
-		public virtual DbSet<Character> Characters { get;set; }
-		public virtual DbSet<CharacterInMovie> CharactersInMovies { get;set; }
+		public virtual DbSet<Genre> Genres { get; set; }
+		public virtual DbSet<Movie> Movies { get; set; }
+		public virtual DbSet<Character> Characters { get; set; }
+		public virtual DbSet<CharacterInMovie> CharactersInMovies { get; set; }
 	}
 }

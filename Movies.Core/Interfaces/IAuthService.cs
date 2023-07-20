@@ -6,18 +6,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Movies.Core.Services
+namespace Movies.Core.Interfaces
 {
 	public interface IAuthService
 	{
-		public Task<AuthModel> RegisterAsync(UserRegisterDto dto);
+		public Task<AuthModel> RegisterAsync(UserRegisterDto dto , string? role = "user");
 
-		public Task<AuthModel> RegisterAsAdmin(UserRegisterDto dto);
 
 		public Task<AuthModel> LoginAsync(UserLoginDto dto);
 
 		public Task<AuthModel> RefreshTokenAsync(string oldRefreshToken);
 
 		public Task<bool> RevokeTokenAsync(string token);
+
+		public Task<string> AddUserToRoleAsync(AddUserToRoleRequestDto dto);
 	}
 }

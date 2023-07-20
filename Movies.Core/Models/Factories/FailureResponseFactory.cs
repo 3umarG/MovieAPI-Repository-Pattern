@@ -1,4 +1,5 @@
 ﻿using Movies.Core.Interfaces;
+using Movies.Core.Models.Responses;
 using System;
 using System.Collections.Generic;
 using System.Linq;

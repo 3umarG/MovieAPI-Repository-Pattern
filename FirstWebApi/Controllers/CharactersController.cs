@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Movies.Core.DTOs;
 using Movies.Core.Interfaces;
+using Movies.Core.Models.Factories;
 using Movies.Core.Models.Responses;
 using System;
 
