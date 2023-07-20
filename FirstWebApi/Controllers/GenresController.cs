@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Movies.Core.Interfaces;
 using Movies.Core.Models.Factories;
 using Movies.Core.Models.Responses;
@@ -23,6 +24,7 @@ namespace MoviesApi.Controllers
 			_unitOfWork = unitOfWork;
 		}
 
+		[Authorize]
 		[ProducesResponseType(StatusCodes.Status200OK , Type = typeof(SuccessResponse<List<GenreResponseDto>>))]
 		[HttpGet]
 		public async Task<IActionResult> GetAllAsync()

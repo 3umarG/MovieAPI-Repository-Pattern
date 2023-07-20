@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Movies.Core.DTOs;
 using Movies.Core.Interfaces;
@@ -21,17 +22,17 @@ namespace Movies.EF.Services
 		private readonly UserManager<ApplicationUser> _userManager;
 		private readonly IMapper _mapper;
 		private readonly JWT _jwt;
-		private readonly RoleManager<ApplicationUser> _roleManager;
+		private readonly RoleManager<IdentityRole> _roleManager;
 
 		public AuthService(
 			UserManager<ApplicationUser> userManager,
 			IMapper mapper,
-			JWT jwt,
-			RoleManager<ApplicationUser> roleManager)
+			IOptions<JWT>  jwt,
+			RoleManager<IdentityRole> roleManager)
 		{
 			_userManager = userManager;
 			_mapper = mapper;
-			_jwt = jwt;
+			_jwt = jwt.Value;
 			_roleManager = roleManager;
 		}
 
