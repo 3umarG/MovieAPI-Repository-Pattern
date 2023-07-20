@@ -81,19 +81,19 @@ namespace Movies.EF.Services
 
 			var user = await _userManager
 								.Users
-								.FirstOrDefaultAsync(u =>	
-									u.RefreshTokens	
+								.FirstOrDefaultAsync(u =>
+									u.RefreshTokens
 									.Any(t => t.Token == oldToken)
 								);
 
-			if(user is null)
+			if (user is null)
 			{
 				auth.Message = "Invalid Refresh Token";
 				return auth;
 			}
 
-			var refreshToken =  user.RefreshTokens.Single(t => t.Token == oldToken);
-			
+			var refreshToken = user.RefreshTokens.Single(t => t.Token == oldToken);
+
 			if (!refreshToken.IsActive)
 			{
 				auth.Message = "Inactive Refresh Token";
@@ -176,9 +176,29 @@ namespace Movies.EF.Services
 			authModel.RefreshTokenExpiration = refreshToken.ExpiresOn;
 		}
 
-		public Task<bool> RevokeTokenAsync(string token)
+		public async Task<bool> RevokeTokenAsync(string token)
 		{
-			throw new NotImplementedException();
+			var user = await _userManager.Users.FirstOrDefaultAsync(u => u.RefreshTokens.Any(t => t.Token == token));
+
+			if (user is null)
+			{
+
+				return false;
+			}
+
+
+			var refreshToken = user.RefreshTokens.Single(t => t.Token == token);
+
+			if (!refreshToken.IsActive)
+			{
+				return false;
+			}
+
+			refreshToken.RevokedOn = DateTime.UtcNow;
+			await _userManager.UpdateAsync(user);
+
+
+			return true;
 		}
 
 		private async Task<JwtSecurityToken> CreateJwtToken(ApplicationUser user)
