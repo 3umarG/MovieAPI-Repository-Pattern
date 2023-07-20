@@ -7,6 +7,25 @@
 *.userosscache
 *.sln.docstates
 
+/.vs
+
+# bin & obj in all folders
+
+/FirstWebApi/bin/Debug/net6.0
+/FirstWebApi/obj/Debug/net6.0
+
+/Movies.Core/bin/Debug/net6.0
+/Movies.Core/obj/Debug/net6.0
+
+/Movies.EF/bin/Debug/net6.0
+/Movies.EF/obj/Debug/net6.0
+
+/Movies.EF.Tests/bin/Debug/net6.0
+/Movies.EF.Tests/obj/Debug/net6.0
+
+/MoviesApi.Tests/bin/Debug/net6.0
+/MoviesApi.Tests/obj/Debug/net6.0
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
