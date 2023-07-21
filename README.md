@@ -1,5 +1,5 @@
 # Movies API
-Simple Api build be .Net Core as Backend Service .
+Simple Api build by .Net Core as Backend Service .
 ## Description
 The Movies API is a powerful and flexible .NET 6 application that serves as a backend for managing movie-related data. It provides a comprehensive platform for storing, retrieving, creating, updating, and deleting movie information, along with associated actors and genres. Whether you're a movie enthusiast or a developer looking to enhance your skills, this API offers an ideal solution for organizing and accessing movie data.
 
@@ -98,7 +98,5 @@ Success (200)
 }
 ```
 ## Database ERD
+![Untitled (1)](https://github.com/OmarGomaaFCi/MovieAPI-Repository-Pattern/assets/90159439/1f28be23-4e00-4662-8d85-ad4ce1a278d0)
 
-....
-
-Feel free to customize this template according to your project's specific needs. Make sure to provide clear and concise explanations to help potential employers or collaborators understand your project and the technologies you used.
