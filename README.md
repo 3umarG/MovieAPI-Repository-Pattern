@@ -74,6 +74,29 @@ Body :
     }
 }
 ```
+
+**refresh-token request**
+```
+GET /api/Auth/refresh-token
+Cookie: refreshToken=**************************
+```
+
+**refresh-token response**
+```
+UnAuthorized (401)
+{
+    "statusCode": 401,
+    "message": "Inactive Refresh Token",
+    "status": false
+}
+
+Success (200)
+{
+    "statusCode": 200,
+    "message": null,
+    "status": true
+}
+```
 ## Database ERD
 
 ....
