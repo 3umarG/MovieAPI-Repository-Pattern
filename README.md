@@ -15,6 +15,10 @@ The Movies API is a powerful and flexible .NET 6 application that serves as a ba
 
 - **Seamless Object Mapping**: AutoMapper plays a vital role in simplifying the mapping process between domain models (entities) and Data Transfer Objects (DTOs). With this library, you can effortlessly transform data between different representations, reducing the amount of manual mapping code and increasing development productivity.
 
+- **Authentication and Authorization Based** : Using JWT tool to create Access Tokens to keep our end points safe from anonymous users .
+
+- **User Management** : Using IdentityFramework with EF Core to store users and keeping them for login again , all this working with JWT Tokens to ensure Security for our API .
+  
 ## Technologies Used
 
 - **.NET 6**: Framework used to develop the API.
@@ -23,6 +27,8 @@ The Movies API is a powerful and flexible .NET 6 application that serves as a ba
 - **XUnit**: Testing framework used for unit testing.
 - **FakeItEasy**: Mocking library used for testing.
 - **AutoMapper**: Used for mapping between domain models (entities) and DTOs.
+- **IdentityFramework** : For User management .
+- **JWT** : To create access tokens to ensure and apply security for API .
 
 ## Installation 
 To set up and run the project locally, follow these steps:
@@ -40,7 +46,34 @@ The API supports operations such as retrieving movies, creating new movies, upda
 
 
 ## Examples
-...
+### Auth Controller :
+**login request**
+```
+POST /api/Auth/login
+
+Body :
+{
+    "emailOrUserName": "abc@example.com",
+    "password": "*****************"
+}
+```
+**login response**
+```
+{
+    "status": true,
+    "statusCode": 200,
+    "message": null,
+    "data": {
+        "userName": "abc@example.com",
+        "email": "abc@example.com",
+        "message": null,
+        "isAuthed": true,
+        "token": "***************************",
+        "accessTokenExpiration": "2023-07-20T18:10:48Z",
+        "refreshTokenExpiration": "2023-07-30T18:09:48.7634758Z"
+    }
+}
+```
 ## Database ERD
 
 ....
