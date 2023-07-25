@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Movies.Core.Interfaces;
 using Movies.Core.Models.Auth;
 using Movies.Core.Models.Factories;
+using Serilog;
 
 namespace MoviesApi.Controllers
 {
@@ -16,13 +17,15 @@ namespace MoviesApi.Controllers
 		private IResponseFactory _successFactory;
 		private IResponseFactory _failureFactory;
 		private readonly IResponseFactory _unAuthorizedFactory;
+		private readonly ILogger<AuthController> _logger;
 
 
-		public AuthController(IAuthService authService, IMapper mapper)
+		public AuthController(IAuthService authService, IMapper mapper, ILogger<AuthController> logger)
 		{
 			_authService = authService;
 			_mapper = mapper;
 			_unAuthorizedFactory = new UnAuthorizedFailureResponseFactory();
+			_logger = logger;
 		}
 
 
@@ -52,6 +55,7 @@ namespace MoviesApi.Controllers
 			if (!result.IsAuthed)
 			{
 				_failureFactory = new FailureResponseFactory((int)HttpStatusCode.Unauthorized, result.Message);
+				_logger.LogInformation("UnAuthorized Login Access !!", _failureFactory.CreateResponse());
 				return Unauthorized(_failureFactory.CreateResponse());
 			}
 
